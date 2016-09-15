@@ -1,6 +1,0 @@
-\beamer@endinputifotherversion {3.36pt}
-\select@language {english}
-\beamer@sectionintoc {1}{Introduction}{3}{0}{1}
-\beamer@sectionintoc {2}{Part I: Data Driven Stream Join (kNN)}{4}{0}{2}
-\beamer@sectionintoc {3}{Part II: Query Driven Stream Join (RDF)}{8}{0}{3}
-\beamer@sectionintoc {4}{Conclusion and Future Work}{27}{0}{4}
