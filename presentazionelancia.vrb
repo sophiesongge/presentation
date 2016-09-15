@@ -1,0 +1,15 @@
+\frametitle{High-Degree Objects}
+    Some object have a lot of associations (remember there were a limit of 6000?)
+    \begin{itemize}
+    ^^I\item TAO can't cache all associations list
+    ^^I\item Requests will always end to Db
+    \end{itemize}
+    so
+    \begin{itemize}
+    ^^I\item For \verb!assoc_count!, the edge direction is chosen using the lower degree between source and destination object
+    ^^I\item For \verb!assoc_get! query, only associations whose time~ >~ object's ~creation~ time
+    \end{itemize}
+
+
+
+
