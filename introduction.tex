@@ -3,12 +3,62 @@
 \setlength{\parskip}{\baselineskip} 
 \section{Introduction}
 \begin{frame}[t]
-\frametitle{Background}
+\frametitle{Introduction}
     \begin{center}
     	\includegraphics<1>[width=1\textwidth]{figs/background.jpg}
     \end{center}
 \end{frame}
 
 \begin{frame}
+\frametitle{Big Data Everywhere}
+\begin{itemize}
+\item Google: 24 PB / day
+
+\item Facebook: 10 millions photos + 3 billion ``likes" / day
+
+\item Youtube: 800 million visitors / month
+
+\item Twitter: Doubling its size every year
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Issues}
+\begin{itemize}
+\item The most significant issue comes from the size of Big Data.
+
+\item The flip side of size is speed.
+
+\item The cost of network communication in transferring data.
+
+\item \textcolor{red}{The dynamics of data.}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Dynamic Data Stream}
+Persistent Static Relations $\Rightarrow$ Transient Dynamic Data Streams
+
+Batch-oriented data processing $\Rightarrow$ Real-time stream processing
+
+\begin{center}
+$\Downarrow$
+\end{center}
+
+\textbf{Architecture Level: } possible to add or remove computational nodes based on the current load
+
+\textbf{Application Level: } able to withdraw old results and take new coming data into account
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Objective: parallel and continuous processing for Join operation}
+\textbf{Join: } a popular and often used operation in the big data area.
+
+\begin{itemize}
+\item Data parallelism $\Rightarrow$ Data Driven Join $\Rightarrow$ kNN
+\item Task parallelism $\Rightarrow$ Query Driven Join $\Rightarrow$ Semantic Join on RDF data
+\end{itemize} 
 
 \end{frame}
