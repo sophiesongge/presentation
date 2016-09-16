@@ -14,7 +14,7 @@
 \begin{frame}
 \frametitle{Outline}
 	\begin{itemize}
-		\item Related Work
+		\item Introduction
 		\item Parallel Workflow
 		\item Theoretical Analysis
 		\item Continuous kNN
@@ -27,7 +27,7 @@
 \begin{frame}
 \frametitle{Outline}
 	\begin{itemize}
-		\item Related Work
+		\item Introduction
 		\item \textcolor{blue!20}{Parallel Workflow}
 		\item \textcolor{blue!20}{Theoretical Analysis}
 		\item \textcolor{blue!20}{Continuous kNN}
@@ -38,19 +38,303 @@
 
 
 \begin{frame}
+\frametitle{Introduction}
 \begin{block}{Definition: kNN}
 Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$ nearest neighbor join} is an operation which, for each point in $R$, discovers the $k$ nearest neighbors in $S$. 
 \end{block}
 \begin{itemize}
-\item 
+\item Query never changes
+\item Data changes: GPS (2 Dimensions), Twitter (77 Dimensions), Images (128 Dimensions) etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Introduction: Basic Idea}
+\begin{itemize}
+\item Nested Loop -- Calculate the Distances (Complexity $O(n^2)$)
+\end{itemize}
+\vspace{-0.3in}
+    \begin{center}
+    	\includegraphics<1>[width=0.4\textwidth]{figs/nestedloop.png}
+    \end{center}
+\vspace{-0.3in}
+\begin{itemize}
+\item Sort -- Find the top k smallest distance (Complexity $n \cdot log(n)$)
+\end{itemize}
+\vspace{-0.2in}
+    \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/quicksort.jpg}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Outline}
+	\begin{itemize}
+		\item Introduction
+		\item Parallel Workflow
+		\item \textcolor{blue!20}{Theoretical Analysis}
+		\item \textcolor{blue!20}{Continuous kNN}
+		\item \textcolor{blue!20}{Experiment Result}
+		\item \textcolor{blue!20}{Conclusion}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Parallel Workflow}
+\begin{itemize}
+\item Data Preprocessing
+\begin{itemize}
+\item To reduce the dimension of data
+\item To select central points of data clusters
+\end{itemize}
+\item Data Partitioning
+\begin{itemize}
+\item Distance Based Partitioning Strategy
+\item Size Based Partitioning Strategy
+\end{itemize}
+\item Computation
+\begin{itemize}
+\item One Round Job
+\item Two Rounds jobs
+\end{itemize}
 \end{itemize}
 \end{frame}
 
 
+\begin{frame}[t]
+\frametitle{Data Preprocessing --- To reduce the dimension of data}
+    \onslide<1>Space Filling Curve (Z-Value)
+    \begin{center}
+    	\includegraphics<1>[width=0.5\textwidth]{figs/z-value.png}
+    \end{center}
+    \vspace{-0.3in}
+	\onslide<2>Locality Sensitive Hashing (LSH)
+	\vspace{-0.3in}
+	\begin{center}
+    	\includegraphics<2>[width=0.5\textwidth]{figs/LSH.png}
+    \end{center}
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+\frametitle{Data Preprocessing --- To reduce the dimension of data}
+\textbf{To avoid the loss of information}
+
+\begin{itemize}
+\item \textbf{z-value: } Create several ``shifts" of data,  calculate z-value for each shift of datas
+
+\item \textbf{LSH: } Use multiple hash families
+\end{itemize}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+\frametitle{Data Preprocessing --- To select central points (Pivots) of data clusters}
+\textbf{Voronoi Diagram: }
+    \begin{center}
+    	\includegraphics<1>[width=0.7\textwidth]{figs/voronoi.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Preprocessing --- To select central points (Pivots) of data clusters}
+\begin{itemize}
+\item \textbf{Random Selection: } generates a set of samples, calculates the pairwise distance of the points in the sample, and the sample with the biggest sum of distances is chosen as the set of pivots
+
+\item \textbf{Furthest Selection: } randomly chooses the  rest pivot, and calculates the furthest point to this chosen pivot as the second pivot, and so on until having the desired number of pivots.
+
+\item \textbf{K-Means Selection: } applies the traditional k-means method on a data sample to update the centroid of a cluster as the new pivot each step, until the set of pivots stabilizes. 
+\end{itemize}
+\end{frame}
 
 
+\begin{frame}
+\frametitle{Data Partitioning --- Basic Idea}
+    \begin{center}
+    	\includegraphics<1>[width=0.4\textwidth]{figs/randompartition.png}
+    \end{center}
+    \vspace{-0.3in}
+    \textcolor{red}{Problem: } $n^2$ tasks for calculating pairwise distances; wastes a lot of hardware resources, and ultimately leads to low efficiency.
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Partitioning --- Motivation}
+The key to improve the performance is to preserve spatial locality of objects when decomposing data for tasks.
+
+More precisely, what we want is:
+for every partition $R_i$ ($\cup_{i}R_i=R$), find a corresponding partition $S_j$ ($\cup_{j}S_j=S$), where:
+\begin{center}
+$kNN(R_i \ltimes S) = kNN(R_i \ltimes S_j)$
+\end{center}
+And,
+\begin{center}
+$kNN(R \ltimes S) = \bigcup kNN(R_i \ltimes S_j)$
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Partitioning --- Motivation}
+    \begin{center}
+    	\includegraphics<1>[width=0.8\textwidth]{figs/advancedpartition.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Partitioning --- Distance Based Partitioning Strategy}
+    \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/voronoipartition.pdf}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Partitioning --- Size Based Partitioning Strategy --- Z-Value}
+    \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/zvaluepartition.pdf}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Data Partitioning --- Size Based Partitioning Strategy --- LSH}
+    \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/lshpartition.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Computation}
+\begin{itemize}
+\item One job --- Direct give the global results
+\item Two consecutive jobs --- First give the local results, then merge the local results into the global results
+\end{itemize}
+
+\textbf{Purpose: } using multiple rounds of jobs in order to reduce the number of elements to be sorted.
+\end{frame}
+
+\begin{frame}
+\frametitle{Computation --- Example}
+For each city in $R$, find the nearest city in $S$.
+	\includegraphics<1>[width=0.6\textwidth]{figs/france.jpg}
+\end{frame}
+
+\begin{frame}
+\frametitle{Computation --- Example}
+\textbf{One Job:}
+ \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/1job.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Computation --- Example}
+\textbf{Two Jobs:}
+ \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/2job.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+	\begin{itemize}
+		\item Introduction
+		\item Parallel Workflow
+		\item Theoretical Analysis
+		\item \textcolor{blue!20}{Continuous kNN}
+		\item \textcolor{blue!20}{Experiment Result}
+		\item \textcolor{blue!20}{Conclusion}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Theoretical Analysis}
+\begin{itemize}
+\item Load Balance
+\item Accuracy
+\item Complexity
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Load Balance}
+\begin{block}{What is Load Balance?}
+\begin{center}
+$\left| R_i \right|$ $\times$ $\left| S_i \right|$ = $\left| R_j \right|$ $\times$ $\left| S_j \right|$
+\end{center}
+\end{block}
+
+\begin{block}{Sub-Optimal Option}
+\begin{center}
+$\forall$ i $\neq$ j, 
+
+if $\left| R_i \right|$ = $\left| R_j \right|$ or $\left| S_i \right|$ = $\left| S_j \right|$, 
+
+then $\left| R_i \right|$ $\times$ $\left| S_i \right|$ $\approx$ $\left| R_j \right|$ $\times$ $\left| S_j \right|$
+\end{center}
+\end{block}
+
+\end{frame}
 
 
+\begin{frame}
+\frametitle{Load Balance}
+\vspace{-0.1in}
+\begin{block}{if $\left| R_i \right|$ = $\left| R_j \right|$, the Worst Case Complexity is:}
+$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\frac{\left|R\right|}{n} \times log\left|S\right|\right)$
+\end{block}
+\vspace{-0.2in}
+\begin{block}{if $\left| S_i \right|$ = $\left| S_j \right|$, the Worst Case Complexity is:}
+$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\left|R\right|\times log\frac{\left|S\right|}{n}\right)$
+\end{block}
+\vspace{-0.2in}
+$n$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right|$ is better.
+
+\textcolor{red}{All advanced partitioning strategies first partition R into equal sized partitions, then find the corresponding S for each R.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Accuracy}
+The lack of accuracy is the direct consequence of techniques to reduce the dimensionality with techniques of as z-values and LSH.
+\begin{itemize}
+\item \textbf{Z-Value}
+\begin{itemize}
+\item Depends on k
+\item Increase the number of shifts of data will decrease the error rate
+\end{itemize}
+\item \textbf{LSH}
+\begin{itemize}
+\item Depends on parameter tuning
+\item Increase the number of hash functions will decrease the error rate
+\end{itemize}
+\end{itemize}
+\end{frame}
 
 
+\begin{frame}
+\frametitle{Complexity}
 
+\begin{itemize}
+\item \textbf{The number of MapReduce jobs: } starting a job requires some initial steps.
+
+\item \textbf{The number of Map tasks and Reduce tasks used to calculate $k$NN$\left(R_i \ltimes S\right)$: } the larger this number is, the more information is exchanged through the network.
+
+\item \textbf{The number of final candidates for each object $r_i$: } 
+We have seen that advanced algorithms use pre-processing and partitioning techniques to reduce this number as much as possible. 
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Main Overhead }
+\begin{itemize}
+\item Communication overhead:
+\begin{itemize}
+\item the amount of data transmitted over the network
+\end{itemize}
+\item Computation overhead:
+\begin{itemize}
+\item computing the distances
+\item finding the k smallest distances
+\end{itemize}
+\end{itemize}
+\end{frame}
