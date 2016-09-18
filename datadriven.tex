@@ -141,7 +141,7 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \begin{frame}
 \frametitle{Data Preprocessing --- To select central points (Pivots) of data clusters}
 \begin{itemize}
-\item \textbf{Random Selection: } generates a set of samples, calculates the pairwise distance of the points in the sample, and the sample with the biggest sum of distances is chosen as the set of pivots
+\item \textbf{Random Selection: } generates a set of samples, calculates the pairwise distance of the points in the sample, and the sample with the biggest sum of distances is chosen as the set of pivots.
 
 \item \textbf{Furthest Selection: } randomly chooses the  rest pivot, and calculates the furthest point to this chosen pivot as the second pivot, and so on until having the desired number of pivots.
 
@@ -522,13 +522,19 @@ $P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and t
 
 \begin{frame}
 \frametitle{Evaluations}
+\textbf{Impacts:  (x axis)}
 \begin{itemize}
 \item Impact of input data size
 \item Impact of k
-\item Communication Overhead
 \item Impact of Dimension and Dataset
-\item Practical Analysis
 \end{itemize}
+\textbf{Measures: (y axis)}
+\begin{itemize}
+\item Execution Time
+\item Communication Overhead
+\item Recall and Precision
+\end{itemize}
+\textbf{Practical Analysis}
 \end{frame}
 
 \begin{frame}
