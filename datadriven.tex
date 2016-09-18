@@ -151,7 +151,7 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 
 
 \begin{frame}
-\frametitle{Data Partitioning --- Basic Idea}
+\frametitle{Data Partitioning --- Basic Idea (Block Nested Loop)}
     \begin{center}
     	\includegraphics<1>[width=0.4\textwidth]{figs/randompartition.png}
     \end{center}
@@ -231,6 +231,13 @@ For each city in $R$, find the nearest city in $S$.
 \textbf{Two Jobs:}
  \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/2job.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Workflow}
+ \begin{center}
+    	\includegraphics<1>[width=1\textwidth]{figs/workflow.png}
     \end{center}
 \end{frame}
 
@@ -337,4 +344,317 @@ We have seen that advanced algorithms use pre-processing and partitioning techni
 \item finding the k smallest distances
 \end{itemize}
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+	\begin{itemize}
+		\item Introduction
+		\item Parallel Workflow
+		\item Theoretical Analysis
+		\item Continuous kNN
+		\item \textcolor{blue!20}{Experiment Result}
+		\item \textcolor{blue!20}{Conclusion}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sliding Window Model --- Motivation}
+\begin{itemize}
+\item Unbounded streams can not be wholly stored in bounded memory
+\item New items in a stream are more relevant than older ones.
+\end{itemize}
+\vspace{-0.2in}
+\begin{block}{Sliding Window Model}
+Maintaining a moving window of the most recent elements in the stream
+\end{block}
+\vspace{-0.2in}
+\begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/stream.png}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sliding Window --- Two Strategies}
+\begin{itemize}
+\item \textbf{Re-Execution Strategy}
+\begin{itemize}
+\item[-] \textbf{Eager Re-execution Strategies} --- Generating new results right after each new data arrives
+\item[-] \textbf{Lazy Re-execution Strategies} --- Re-Executing the query periodically
+\end{itemize}
+\item \textbf{Data Invalidation Strategy}
+\begin{itemize}
+\item[-] \textbf{Eager Expiration Strategies} --- Scanning and moving forward the sliding window upon arrival of new data
+\item[-] \textbf{Lazy Re-execution Strategies} --- Removing old data periodically and require more memory to store data waiting for expiration
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sliding Window --- Two Strategies}
+\begin{itemize}
+\item \textbf{Re-Execution Strategy}
+\begin{itemize}
+\item[-] Eager Re-execution Strategies
+\item[-] \textcolor{red}{Lazy Re-execution Strategies}
+\end{itemize}
+\item \textbf{Data Invalidation Strategy}
+\begin{itemize}
+\item[-] Eager Expiration Strategies
+\item[-] \textcolor{red}{Lazy Re-execution Strategies}
+\end{itemize}
+\end{itemize}
+\textcolor{red}{Re-Execution and Expiration Period --- Generation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Different types of dynamic kNN joins}
+\begin{itemize}
+\item Static R and Dynamic S (SRDS)
+\begin{itemize}
+\item[-] Exists rarely in real applications. 
+\item[-] Reuse the parallel methods
+\end{itemize}
+\item Dynamic R and Static S (DRSS)
+\begin{itemize}
+\item[-] Most used scenario in real applications
+\item[-] Reuse Random Partition method
+\end{itemize}
+\item Dynamic R and Dynamic S (DRDS)
+\begin{itemize}
+\item[-] General situation
+\item[-] Basic Method + Advanced Method
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Dynamic R and Dynamic S --- Basic Method (Sliding Block Nested Loop)}
+\begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/slidingradompartition.png}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Dynamic R and Dynamic S --- Advanced Method (Naive Bayes Partitioning)}
+\textbf{Purpose: } partition the new data items without moving the old ones.
+\begin{block}{Naive Bayes Theory}
+Given two independent events A and B, the conditional probability of given B and A occurs is:
+\begin{equation}
+P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\end{equation}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{DRDS --- Advanced Method --- Naive Bayes Partitioning}
+We consider the n partitions from $N_1$ to $N_n$ as n different classes and the already partitioned data as training set. 
+The probability that a new point $x$ belongs to $N_i$ is:
+\begin{equation}
+P(N_i | x) = \frac{P(x | N_i) \cdot P(N_i)}{P(x)}
+\end{equation}
+
+And $x$ should be assigned to the partition $N_y$ which has the biggest probability:
+\begin{equation}
+x \in N_y, \  where \ P(N_y|x) = max\{P(N_1|x), P(N_2|x), ..., P(N_n|x)\}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Naive Bayes Partitioning}
+Partitioning Problem = The calculation of $P(N_i|x)$
+\begin{equation}
+P(N_i|x) = P(N_i|(l_1(x), l_2(x), ..., l_p(x)))
+\end{equation}
+According to Bayes' Theorem:
+\begin{equation}
+= \frac{P( (l_1(x), l_2(x), ..., l_p(x))|N_i )}{P(  l_1(x), l_2(x), ..., l_p(x) )}
+\end{equation}
+Since $l_1$, $l_2$, ..., $l_p$ are independent, we have:
+\begin{equation}
+= \frac{ P(l_1(x)|N_i) \cdot P( l_2(x)|N_i ) ...  \cdot P(l_p(x)|N_i)   \cdot P(N_i)}{P(l_1(x)) \cdot P(l_2(x)) ... \cdot P(l_p(x))   }
+\end{equation}
+
+$P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and this probability is decided by the distribution of data on $N_i$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+	\begin{itemize}
+		\item Introduction
+		\item Parallel Workflow
+		\item Theoretical Analysis
+		\item Continuous kNN
+		\item Experiment Result
+		\item \textcolor{blue!20}{Conclusion}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Experiment Setting}
+\textbf{Cluster Setting}
+\vspace{-0.1in}
+\begin{itemize}
+\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3
+
+\item The number of replications for each split of data is set to 3
+
+\item The number of slots of each node is 1
+\end{itemize}
+\textbf{Datasets}
+\vspace{-0.1in}
+\begin{itemize}
+\item \textbf{OpenStreetMap} Geo dataset contains geographic XML data in two dimensions  --- Low Dimension
+\item \textbf{Catech 101} It is a public set of images, which contains 101 categories of pictures of different objects. (Speeded Up Robust Features --- 128 dimensions) --- High Dimension
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Methods Evaluated}
+\begin{itemize}
+\item \textbf{H-BkNNJ} Naive Method -- Without preprocessing and partitioning -- One Job
+\item \textbf{H-BNLJ} Block Nested Loop -- Without preprocessing and partitioning -- Two Jobs
+\item \textbf{PGBJ} Based on Voronoi -- Preprocessing: Select Pivots -- Distance Based Partitioning -- One Job
+\item \textbf{H-zkNNJ} Based on Z-Value -- Preprocessing: z-value -- Size Based Partitioning -- Two Jobs
+\item \textbf{RankReduce} Based on LSH -- Preprocessing: LSH -- Size Based Partitioning -- Two Jobs
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Evaluations}
+\begin{itemize}
+\item Impact of input data size
+\item Impact of k
+\item Communication Overhead
+\item Impact of Dimension and Dataset
+\item Practical Analysis
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Evaluation Result --- Verify the theoretical Analysis}
+Execution Time for Geo dataset (2 dimensions): 
+\vspace{-0.2in}
+\begin{center}
+    	\includegraphics<1>[width=0.7\textwidth]{figs/time.pdf}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Evaluation Result --- Surprise}
+Execution Time for Image dataset (128 dimensions):
+\vspace{-0.2in}
+\begin{center}
+    	\includegraphics<1>[width=0.7\textwidth]{figs/time_surf.pdf}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+	\begin{itemize}
+		\item Introduction
+		\item Parallel Workflow
+		\item Theoretical Analysis
+		\item Continuous kNN
+		\item Experiment Result
+		\item Conclusion
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusion}
+\vspace{-0.2in}
+\begin{table}
+ 	\begin{center}\renewcommand{\arraystretch}{1.2}
+ 	\resizebox{\textwidth}{!}{
+ 		\begin{tabular}{|c|c|c|c|}
+ 			\hline
+ 			\textbf{Algorithm}  & \textbf{Advantage}  &  \textbf{Shortcoming}   & \textbf{Typical Usecase} \\
+ 			 \hline
+ 			\textbf{H-BkNNJ} 	& 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 					Trivial to implement  
+ 				\end{tabular} & 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 					1. Breaks very quickly \\ 
+ 					2. Optimal parallelism difficult\\ 
+ 					to achieve a priori
+ 				\end{tabular} &
+ 				\begin{tabular}[c]{@{}c@{}}
+ 			    	Any tiny and low dimension dataset\\
+ 			    	($\sim$ 25000 records)
+ 			    \end{tabular} \\ \hline
+ 			\textbf{H-BNLJ}     &
+ 				\begin{tabular}[c]{@{}c@{}}
+ 				 	Easy to implement
+ 				\end{tabular} & 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 				 	1. Slow\\
+ 				 	2. Very large communication overhead 
+ 				\end{tabular} & 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 				 	Any small/medium dataset\\
+ 				 	($\sim$ 100000 records)
+ 				\end{tabular} \\ \hline
+ 			\textbf{PGBJ}       & 
+	 			\begin{tabular}[c]{@{}c@{}}
+ 				   	1. Exact solution\\ 
+ 				   	2. Lowest disk usage\\ 
+ 			       	3. No impact on communication\\
+ 			       	overhead with the increase of $k$
+	 			\end{tabular}        & 
+	 			\begin{tabular}[c]{@{}c@{}}
+	 				1. Cannot finish in reasonable time\\ 
+	 				for large datasets\\ 
+	 				2. Poor performance for high\\
+	 				dimension data\\
+	 				3. Large communication overhead\\
+	 				4. Performance highly depends on\\ 
+	 				the quality of a priori chosen pivots
+	 			\end{tabular} & 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 					1. Medium/large dataset for\\
+ 					low/medium dimension\\
+ 					2. Exact results
+ 				\end{tabular} \\ \hline
+ 			\textbf{H-zkNNJ}    &
+	 			\begin{tabular}[c]{@{}c@{}}
+	 			    1. Fast\\ 
+	 			    2. Does not require a priori parameter\\ 
+	 			    tuning \\ 
+	 			    3. More precise for large k \\ 
+	 			    4. Always give the right number of $k$	 	
+	 	        \end{tabular} & 
+	 	        \begin{tabular}[c]{@{}c@{}}
+	 	        	1. High disk usage\\ 
+	 	        	2. Slow for large dimension \\ 
+	 	        	3. Very high space requirement ratio \\ 
+	 	        	for small values of $k$
+ 				\end{tabular} & 
+ 				\begin{tabular}[c]{@{}c@{}}
+ 					1. Large dataset of small dimension\\
+ 					2. High values of $k$\\
+ 			        3. Approximate results
+ 				\end{tabular} \\ \hline
+ 			\textbf{RankReduce} & 
+ 			\begin{tabular}[c]{@{}c@{}}
+ 				1. Fast\\ 
+ 				2. Low footprint on disk usage
+ 			\end{tabular} & 
+ 			\begin{tabular}[c]{@{}c@{}}
+ 				1. Fine parameter tuning required with\\ 
+ 				experimental set up \\
+ 				2. Multiple hash functions needed for\\
+ 				acceptable recall \\
+ 				3. Different quality metrics to consider\\
+ 				(recall + precision)
+ 		   \end{tabular}                                           
+ 			& \begin{tabular}[c]{@{}c@{}}
+ 				1. Large dataset of any dimension \\
+ 				2. Approximate results \\
+ 				3. Room for parameter tuning
+ 			\end{tabular} \\ \hline
+ 		\end{tabular}} 
+ 	\end{center}
+ \end{table}
 \end{frame}
