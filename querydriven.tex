@@ -517,7 +517,15 @@ MV
 \frametitle{Accuracy}
 \textbf{We got 100\% correct results --- Surprise!}
 
-Because we use p and n to decide m. Each time n is set to the number of elements contained by each generation, but actually, the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern, which is much less then what we set. Since each time we set p to 0.05\%, which is rather small, we didn't get any false positive results in our experiments.
+\begin{itemize}
+\item use p (false positive rate) and n (number of element to be inserted) to decide m (number of bits in the Bloom Filter)
+
+\item n is set to the number of elements received by the triple pattern
+
+\item the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern (far less than n)
+\end{itemize}
+
+%Because we use p and n to decide m. Each time n is set to the number of elements contained by each generation, but actually, the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern, which is much less then what we set. Since each time we set p to 0.05\%, which is rather small, we didn't get any false positive results in our experiments.
 \end{frame}
 
 \begin{frame}
