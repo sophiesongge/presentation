@@ -59,7 +59,7 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
     \end{center}
 \vspace{-0.3in}
 \begin{itemize}
-\item Sort -- Find the top k smallest distance (Complexity $n \cdot log(n)$)
+\item Sort -- Find the top k smallest distance for each element (Complexity: Quick Sort: $n \cdot log(n)$, Priority Queue: $log(n)$)
 \end{itemize}
 \vspace{-0.2in}
     \begin{center}
@@ -103,23 +103,29 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \end{frame}
 
 
-\begin{frame}[t]
-\frametitle{Data Preprocessing --- To reduce the dimension of data}
-    \onslide<1>Space Filling Curve (Z-Value)
+\begin{frame}
+\frametitle{Data Preprocessing --- Reducing the dimension of data}
+Space Filling Curve (Z-Value) ---> Project high dimensional data to 1 dimension
+    \vspace{-0.2in}
     \begin{center}
     	\includegraphics<1>[width=0.5\textwidth]{figs/z-value.png}
     \end{center}
-    \vspace{-0.3in}
-	\onslide<2>Locality Sensitive Hashing (LSH)
+   \tiny{ [z-value]:  Efficient parallel kNN joins for large data in MapReduce, EDBT 2012,  Chi Zhang et. al.}
+\end{frame}
+
+\begin{frame}[t]
+\frametitle{Data Preprocessing --- Reducing the dimension of data}
+	Locality Sensitive Hashing (LSH)
 	\vspace{-0.3in}
 	\begin{center}
-    	\includegraphics<2>[width=0.5\textwidth]{figs/LSH.png}
+    	\includegraphics<1>[width=0.5\textwidth]{figs/LSH.png}
     \end{center}
+    \tiny{[LSH]:  RankReduce - processing K-Nearest Neighbor queries on top of MapReduce, LSDS-IR 2010, Aleksandar Stupar et. al.}
 \end{frame}
 
 \begin{comment}
 \begin{frame}
-\frametitle{Data Preprocessing --- To reduce the dimension of data}
+\frametitle{Data Preprocessing --- Reducing the dimension of data}
 \textbf{To avoid the loss of information}
 
 \begin{itemize}
@@ -131,13 +137,24 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \end{comment}
 
 \begin{frame}
-\frametitle{Data Preprocessing --- To select central points (Pivots) of data clusters}
+\frametitle{Data Preprocessing --- Selecting central points (Pivots) of data clusters}
 \textbf{Voronoi Diagram: }
-    \begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/voronoi.png}
-    \end{center}
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item Random Selection
+\item Furthest Selection
+\item K-Means Selection
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+ 	\includegraphics<1>[width=1\textwidth]{figs/voronoi.png}
+\end{column}
+\end{columns}
+\tiny{[voronoi]: Efficient Processing of k Nearest Neighbor Joins using MapReduce, VLDB 2012, Wei Lu et. al.}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Data Preprocessing --- To select central points (Pivots) of data clusters}
 \begin{itemize}
@@ -146,6 +163,28 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \item \textbf{Furthest Selection: } randomly chooses the first pivot, and calculates the furthest point to this chosen pivot as the second pivot, and so on until having the desired number of pivots.
 
 \item \textbf{K-Means Selection: } applies the traditional k-means method on a data sample to update the centroid of each cluster as the new pivots in each step, until the set of pivots stabilizes. 
+\end{itemize}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+\frametitle{Parallel Workflow}
+\begin{itemize}
+\item Data Preprocessing
+\begin{itemize}
+\item To reduce the dimension of data
+\item To select central points of data clusters
+\end{itemize}
+\item Data Partitioning
+\begin{itemize}
+\item Distance Based Partitioning Strategy
+\item Size Based Partitioning Strategy
+\end{itemize}
+\item \textcolor{blue!20}{Computation}
+\begin{itemize}
+\item \textcolor{blue!20}{One Round Job}
+\item \textcolor{blue!20}{Two Rounds jobs}
+\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -182,7 +221,7 @@ $kNN(R \ltimes S) = \bigcup kNN(R_i \ltimes S_j)$
 \end{frame}
 
 \begin{frame}
-\frametitle{Data Partitioning --- Distance Based Partitioning Strategy}
+\frametitle{Data Partitioning --- Distance Based Partitioning Strategy --- Voronoi Diagram}
     \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/voronoipartition.pdf}
     \end{center}
@@ -325,9 +364,7 @@ The lack of accuracy is the direct consequence of techniques to reduce the dimen
 
 \item \textbf{The number of Map tasks and Reduce tasks used to calculate $k$NN$\left(R_i \ltimes S\right)$: } the larger this number is, the more information is exchanged through the network.
 
-\item \textbf{The number of final candidates for each object $r_i$: } 
-We have seen that advanced algorithms use pre-processing and partitioning techniques to reduce this number as much as possible. 
-
+\item \textbf{The number of final candidates for each object $r_i$: }  Finding the top k results is very time consuming. 
 \end{itemize}
 \end{frame}
 
@@ -384,7 +421,7 @@ Maintaining a moving window of the most recent elements in the stream
 \end{itemize}
 \item \textbf{Data Invalidation Strategy}
 \begin{itemize}
-\item[-] \textbf{Eager Expiration Strategies} --- Scanning and moving forward the sliding window upon arrival of new data
+\item[-] \textbf{Eager Invalidation Strategies} --- Scanning and moving forward the sliding window upon arrival of new data
 \item[-] \textbf{Lazy Re-execution Strategies} --- Removing old data periodically and require more memory to store data waiting for expiration
 \end{itemize}
 \end{itemize}
@@ -401,7 +438,7 @@ Maintaining a moving window of the most recent elements in the stream
 \item \textbf{Data Invalidation Strategy}
 \begin{itemize}
 \item[-] Eager Expiration Strategies
-\item[-] \textcolor{red}{Lazy Re-execution Strategies}
+\item[-] \textcolor{red}{Lazy Invalidation Strategies}
 \end{itemize}
 \end{itemize}
 \vspace{-0.2in}
