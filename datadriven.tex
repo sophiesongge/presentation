@@ -314,19 +314,15 @@ For each city in $R$, find the nearest city in $S$.
 		\item Introduction
 		\item Parallel Workflow
 		\item Theoretical Analysis
-		\item \textcolor{blue!20}{Continuous kNN}
-		\item \textcolor{blue!20}{Experiment Result}
-		\item \textcolor{blue!20}{Conclusion}
-	\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Theoretical Analysis}
-\begin{itemize}
+		\begin{itemize}
 \item Load Balance
 \item Accuracy
 \item Complexity
 \end{itemize}
+		\item \textcolor{blue!20}{Continuous kNN}
+		\item \textcolor{blue!20}{Experiment Result}
+		\item \textcolor{blue!20}{Conclusion}
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -373,6 +369,7 @@ The lack of accuracy is the direct consequence of techniques to reduce the dimen
 \item \textbf{Z-Value}
 \begin{itemize}
 \item Depends on k
+\item Shift of data --- move data in the direction of a random vector
 \item Increase the number of shifts of data will decrease the error rate
 \end{itemize}
 \item \textbf{LSH}
@@ -500,6 +497,7 @@ Maintaining a moving window of the most recent elements in the stream
 
 \begin{frame}
 \frametitle{Dynamic R and Dynamic S --- Basic Method (Sliding Block Nested Loop)}
+\textbf{$n^2$ tasks for each generation}
 \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/slidingradompartition.png}
  \end{center}
@@ -507,15 +505,19 @@ Maintaining a moving window of the most recent elements in the stream
 
 \begin{frame}
 \frametitle{Dynamic R and Dynamic S --- Advanced Method (Naive Bayes Partitioning)}
-\textbf{Purpose: } partition the new data items without moving the old ones.
+\textbf{n tasks for each generation: }partition the new data items without moving the old ones.
+\vspace{-0.2in}
 \begin{block}{Naive Bayes Theory}
-Given two independent events A and B, the conditional probability of given B and A occurs is:
+Given two independent events A and x, the conditional probability of given x and A occurs is:
 \begin{equation}
-P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+P(A|x) = \frac{P(x|A) \cdot P(A)}{P(x)}
 \end{equation}
 \end{block}
+\vspace{-0.2in}
+The new data x will be partitioned to the partition with the highest conditional probability.
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{DRDS --- Advanced Method --- Naive Bayes Partitioning}
 We consider the n partitions from $N_1$ to $N_n$ as n different classes and the already partitioned data as training set. 
@@ -547,6 +549,8 @@ Since $l_1$, $l_2$, ..., $l_p$ are independent, we have:
 
 $P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and this probability is decided by the distribution of data on $N_i$.
 \end{frame}
+\end{comment}
+
 
 \begin{frame}
 \frametitle{Outline}
@@ -610,19 +614,41 @@ $P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and t
 \begin{frame}
 \frametitle{Evaluation Result --- Verify the theoretical Analysis}
 Execution Time for Geo dataset (2 dimensions): 
-\vspace{-0.2in}
-\begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/time.pdf}
- \end{center}
+
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item H-BkNNJ: Naive
+\item H-BNLJ: Block Nested Loop
+\item PGBJ: Voronoi
+\item H-zkNNJ: z-value
+\item RankReduce: LSH
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+\includegraphics<1>[width=1.2\textwidth]{figs/time.pdf}
+\end{column}
+\end{columns} 
+
 \end{frame}
 
 \begin{frame}
 \frametitle{Evaluation Result --- Surprise}
 Execution Time for Image dataset (128 dimensions):
-\vspace{-0.2in}
-\begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/time_surf.pdf}
- \end{center}
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item H-BkNNJ: Naive
+\item H-BNLJ: Block Nested Loop
+\item PGBJ: Voronoi
+\item H-zkNNJ: z-value
+\item RankReduce: LSH
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+	\includegraphics<1>[width=1.2\textwidth]{figs/time_surf.pdf}
+\end{column}
+\end{columns} 
 \end{frame}
 
 \begin{frame}
@@ -637,6 +663,24 @@ Execution Time for Image dataset (128 dimensions):
 	\end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+
+\item Parallel Workflow for kNN Join
+
+\item Continuous kNN Join for Data Streams
+
+\item Theoretical Analysis
+
+\item Experimental Analysis for 5 Methods
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{comment}
 \begin{frame}
 \frametitle{Conclusion}
 \vspace{-0.2in}
@@ -734,3 +778,4 @@ Execution Time for Image dataset (128 dimensions):
  	\end{center}
  \end{table}
 \end{frame}
+\end{comment}
