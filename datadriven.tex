@@ -105,7 +105,7 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 
 \begin{frame}
 \frametitle{Data Preprocessing --- Reducing the dimension of data}
-Space Filling Curve (Z-Value) ---> Project high dimensional data to 1 dimension
+Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension while preserving the locality information
     \vspace{-0.2in}
     \begin{center}
     	\includegraphics<1>[width=0.5\textwidth]{figs/z-value.png}
@@ -115,7 +115,7 @@ Space Filling Curve (Z-Value) ---> Project high dimensional data to 1 dimension
 
 \begin{frame}[t]
 \frametitle{Data Preprocessing --- Reducing the dimension of data}
-	Locality Sensitive Hashing (LSH)
+	Locality Sensitive Hashing (LSH) --- Map the neighbor points into the same buckets with a high probability using Hash Families
 	\vspace{-0.3in}
 	\begin{center}
     	\includegraphics<1>[width=0.5\textwidth]{figs/LSH.png}
@@ -201,16 +201,13 @@ Space Filling Curve (Z-Value) ---> Project high dimensional data to 1 dimension
 \begin{frame}
 \frametitle{Data Partitioning --- Motivation}
 The key to improve the performance is to preserve spatial locality of objects when decomposing data for tasks.
-
-More precisely, what we want is:
-for every partition $R_i$ ($\cup_{i}R_i=R$), find a corresponding partition $S_j$ ($\cup_{j}S_j=S$), where:
-\begin{center}
-$kNN(R_i \ltimes S) = kNN(R_i \ltimes S_j)$
-\end{center}
-And,
-\begin{center}
-$kNN(R \ltimes S) = \bigcup kNN(R_i \ltimes S_j)$
-\end{center}
+    \begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/join1.png}
+    \end{center}
+    \vspace{-0.3in}
+        \begin{center}
+    	\includegraphics<1>[width=0.8\textwidth]{figs/join2.png}
+    \end{center}
 \end{frame}
 
 \begin{frame}
@@ -222,16 +219,47 @@ $kNN(R \ltimes S) = \bigcup kNN(R_i \ltimes S_j)$
 
 \begin{frame}
 \frametitle{Data Partitioning --- Distance Based Partitioning Strategy --- Voronoi Diagram}
-    \begin{center}
-    	\includegraphics<1>[width=0.6\textwidth]{figs/voronoipartition.pdf}
-    \end{center}
+This strategy wants to have the most relevant points in each partition. 
+   
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item[1] Selection Pivots in R
+\item[2] Partition R
+\item[3] Upper Bound in R
+\item[4] Find corresponding partition in S for each R
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+ 	\includegraphics<1>[width=1\textwidth]{figs/V1.png}
+ 	\includegraphics<2>[width=1\textwidth]{figs/V2.png}
+ 	\includegraphics<3>[width=1\textwidth]{figs/V3.png}
+ 	\includegraphics<4>[width=1\textwidth]{figs/V4.png}
+ 	\includegraphics<5>[width=1\textwidth]{figs/V5.png}
+\end{column}
+\end{columns} 
+   
 \end{frame}
 
 \begin{frame}
 \frametitle{Data Partitioning --- Size Based Partitioning Strategy --- Z-Value}
-    \begin{center}
-    	\includegraphics<1>[width=0.6\textwidth]{figs/zvaluepartition.pdf}
-    \end{center}
+This strategy wants to make each partition have equal size in order to achieve a good load balance.
+
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item[1] A Sample of R
+\item[2] Find Quantiles in the Sample as the Bounds of the Partitions in R
+\item[3] Find corresponding partition in S for each R
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+ 	\includegraphics<1>[width=1\textwidth]{figs/Z1.png}
+ 	\includegraphics<2>[width=1\textwidth]{figs/Z2.png}
+ 	\includegraphics<3>[width=1\textwidth]{figs/Z3.png}
+\end{column}
+\end{columns} 
+
 \end{frame}
 
 \begin{frame}
