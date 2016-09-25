@@ -350,14 +350,14 @@ then $\left| R_i \right|$ $\times$ $\left| S_i \right|$ $\approx$ $\left| R_j \r
 \frametitle{Load Balance}
 \vspace{-0.1in}
 \begin{block}{if $\left| R_i \right|$ = $\left| R_j \right|$, the Worst Case Complexity is:}
-$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\frac{\left|R\right|}{n} \times log\left|S\right|\right)$
+$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\frac{\left|R\right|}{p} \times log\left|S\right|\right)$
 \end{block}
 \vspace{-0.2in}
 \begin{block}{if $\left| S_i \right|$ = $\left| S_j \right|$, the Worst Case Complexity is:}
-$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\left|R\right|\times log\frac{\left|S\right|}{n}\right)$
+$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\left|R\right|\times log\frac{\left|S\right|}{p}\right)$
 \end{block}
 \vspace{-0.2in}
-$n$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right|$ is better.
+$p$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right|$ is better.
 
 \textcolor{red}{All advanced partitioning strategies first partition R into equal sized partitions, then find the corresponding S for each R.}
 \end{frame}

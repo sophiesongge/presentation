@@ -17,7 +17,6 @@
 		\item Query Decomposition and Data Partition
 		\item Parallel and Distributed Query Plan
 		\item Continuous Join
-		\item Analysis
 		\item Implementation
 		\item Experiment Result
 		\item Conclusion
@@ -32,7 +31,6 @@
 		\item \textcolor{blue!20}{Query Decomposition and Data Partition}
 		\item \textcolor{blue!20}{Parallel and Distributed Query Planner}
 		\item \textcolor{blue!20}{Continuous Join}
-		\item \textcolor{blue!20}{Analysis}
 		\item \textcolor{blue!20}{Implementation}
 		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
@@ -85,14 +83,34 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Related Works --- 4 Types of Processing}
-    \begin{center}
-    	\includegraphics<1>[width=0.5\textwidth]{figs/type.png}
-    \end{center}
+\frametitle{Query Driven Join}
+\begin{itemize}
+\item Data format does not change
+\item Query changes
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Partitioning Strategies}
+\frametitle{Related Works --- 4 Types of Processing}
+
+\begin{columns}
+\begin{column}{0.45\textwidth}
+ 	\begin{itemize}
+\item QI: Centralize
+\item Q2 and Q4: Distribute either data or query
+\item Q3: Distribute both data and query (We use this manner)
+\end{itemize}
+\end{column}
+\begin{column}{0.55\textwidth}
+ 	\includegraphics<1>[width=1\textwidth]{figs/type.png}
+\end{column}
+\end{columns} 
+\vspace{-0.2in}    
+    \tiny{DREAM: distributed RDF engine with adaptive query planner and minimal communication, PVLDB 2015, Mohammad Hammoud et. al.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Related Work --- Partitioning Strategies for RDF graphs}
 \begin{itemize}
 \item  Vertex Partitioning methods for graphs. 
 \begin{itemize}
@@ -106,15 +124,22 @@
 
 \begin{frame}
 \frametitle{Hash Partitioning --- Index}
-    \begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/rdf3x.png}
-    \end{center}
+\begin{columns}
+\begin{column}{0.45\textwidth}
+Too many indexes!!!
+\end{column}
+\begin{column}{0.55\textwidth}
+    	\includegraphics<1>[width=1\textwidth]{figs/rdf3x.png}
+\end{column}
+\end{columns}
+\vspace{0.1in}
+    \tiny{RDF-3X: a risc-style engine for RDF, PVLDB 2008, Thomas Neumann et. al.}
 \end{frame}
 
 \begin{frame}
-\frametitle{Steps}
+\frametitle{General Distributed Processing Steps}
 \begin{itemize}
-\item Partition the RDF streams, and disperse these sub-streams to the nodes
+\item Partition the RDF streams, and distribute these sub-streams to different nodes
 \item Decompose the queries into sub-queries and assign these sub-queries to the appropriate nodes
 \item Reply rapidly to the changes of data (the expiration of old data, and the update of new data), and return the results in real-time
 \end{itemize}
@@ -128,7 +153,6 @@
 		\item Query Decomposition and Data Partition
 		\item \textcolor{blue!20}{Parallel and Distributed Query Planner}
 		\item \textcolor{blue!20}{Continuous Join}
-		\item \textcolor{blue!20}{Analysis}
 		\item \textcolor{blue!20}{Implementation}
 		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
@@ -137,19 +161,21 @@
 
 \begin{frame}
 \frametitle{Query Decomposition}
-\textbf{Decomposition Strategy: }Divide the queries into triple patterns, send each triple pattern to some corresponding machines.
+\textbf{Decomposition Strategy: }Divide the queries into triple patterns, send each triple pattern to different machines.
 \begin{itemize}
 \item It is simple, and does not require any complicated computations.
-\item The sub-streams can be easily assigned to the sub-queries.
+%\item The sub-streams can be easily assigned to the sub-queries.
 \item The performance or accuracy of this method does not depend on the index or replication of data.
-\item Among the triples processed by a query, the number of different subjects or objects involved could be tens of thousands; But the number of triple patterns is a limited and  fixed number.
+\item The number of triple patterns is limited
+
+%Among the triples processed by a query, the number of different subjects or objects involved could be tens of thousands; But the number of triple patterns is a limited and  fixed number.
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Sub-Query Scheduling}
-\textbf{Edge Coloring Method:}
+\textbf{Edge Coloring Method:} Maximize Parallelism
 \vspace{-0.2in}
     \begin{center}
     	\includegraphics<1>[width=0.5\textwidth]{figs/17.png}
@@ -158,12 +184,11 @@
 
 \begin{frame}
 \frametitle{Data Partitioning}
-\textbf{Partitioning Strategy: }The triples with the same predicate will be assigned to the same nodes that hold the triple pattern with that same predicate.
+\textbf{Partitioning Strategy: }The triples will be assigned to the nodes that hold the triple pattern with the same predicate.
 \begin{itemize}
 \item It does not require any index, and will not occupy more disk space.
 \item It can quickly adapt to changes in data, and it does not require any re-partitioning on
 the existing data when new data arrives or old data expires.
-\item The number of different types of subjects and objects involved could be tens of thousands; But the number of different predicates is limited, and this number must be smaller than the number of triple patterns that compose this query.
 \end{itemize}
 \end{frame}
 
@@ -183,16 +208,18 @@ the existing data when new data arrives or old data expires.
 \end{frame}
 
 \begin{frame}
-\frametitle{Problems to be solved to complete the decomposition and partitioning idea}
+\frametitle{Challenges}
 \begin{itemize}
-\item The communication among nodes
-\item The join of the intermediate results produced by each triple pattern
-\item The order of sending and receiving information
+\item Communication among nodes
+\item Join of the intermediate results produced by each triple pattern
+\item Order of sending and receiving information
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{The communication among nodes --- Bloom Filter}
+\frametitle{Communication among nodes --- Bloom Filter}
+Do not send triples, send Bloom Filters
+\vspace{-0.2in}
 \begin{center}
     \includegraphics<1>[height=0.5\textwidth]{figs/bloomfilter_1.png}
     \includegraphics<2>[height=0.5\textwidth]{figs/bloomfilter_2.png}    	
@@ -201,8 +228,18 @@ the existing data when new data arrives or old data expires.
     \includegraphics<5>[height=0.5\textwidth]{figs/bloomfilter_5.png}    	
     \includegraphics<6>[height=0.5\textwidth]{figs/bloomfilter_6.png}
     \includegraphics<7>[height=0.5\textwidth]{figs/bloomfilter_7.png}
-    \includegraphics<8>[height=0.5\textwidth]{figs/bloomfilter_8.png}
+ %   \includegraphics<8>[height=0.5\textwidth]{figs/bloomfilter_8.png}
 \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Communication among nodes --- Bloom Filter}
+\begin{block}{False Positive Rate}
+\begin{center}
+p = $(1-e^{-\frac{nk}{m}})^k$
+\end{center}
+\end{block}
+
 \end{frame}
 
 \begin{frame}
@@ -210,12 +247,12 @@ the existing data when new data arrives or old data expires.
 
 \begin{itemize}
 
-\item \textbf{Builder: } The triple patterns used to Build the Bloom Filter
+\item \textbf{Builder: } inserts the results of the triple pattern to the Bloom Filter.
 
-\item \textbf{Prober: } The triple patterns used to Probe the Bloom Filter
+\item \textbf{Prober: } checks the existence of the results of the triple pattern in the Bloom Filter
 
 \end{itemize}
-
+\textbf{Question: } Which triple patterns should be \textbf{Builders}, and which ones should be \textbf{Probers}?
 \end{frame}
 
 \begin{frame}
@@ -258,6 +295,7 @@ the existing data when new data arrives or old data expires.
  	\includegraphics<1>[width=1\textwidth]{figs/9.png}
 \end{column}
 \end{columns}
+\textbf{Question: } what is the sending and receiving order?
 \end{frame}
 
 \begin{frame}
@@ -290,7 +328,6 @@ the existing data when new data arrives or old data expires.
 		\item Query Decomposition and Data Partition
 		\item Parallel and Distributed Query Planner
 		\item Continuous Join
-		\item \textcolor{blue!20}{Analysis}
 		\item \textcolor{blue!20}{Implementation}
 		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
@@ -304,6 +341,7 @@ the existing data when new data arrives or old data expires.
     \end{center}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Outline}
 	\begin{itemize}
@@ -358,7 +396,7 @@ p = $\frac{1}{2}^k$ = $2^{-ln2 \times \frac{m}{n}}$
 \vspace{-0.25in}
 Idea: p reaches the minimum value, when the derivation of p reaches 0.
 \end{frame}
-
+\end{comment}
 
 
 \begin{frame}
@@ -368,7 +406,6 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 		\item Query Decomposition and Data Partition
 		\item Parallel and Distributed Query Planner
 		\item Continuous Join
-		\item Analysis
 		\item Implementation
 		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
@@ -407,7 +444,6 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 		\item Query Decomposition and Data Partition
 		\item Parallel and Distributed Query Planner
 		\item Continuous Join
-		\item Analysis
 		\item Implementation
 		\item Experiment Result
 		\item \textcolor{blue!20}{Conclusion}
@@ -417,7 +453,7 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 \begin{frame}
 \frametitle{Experiment Setting}
 \begin{itemize}
-\item We evaluate the system on Grid 5000 4, with 11 nodes. Among them, one is reserved to be Nimbus, and the rest 10 nodes are used for computing. 
+\item We evaluate the system on Grid 5000, with 11 nodes. 1 Master (Nimbus), 10 Slaves (Supervisor). 
 
 \item The Storm version is 1.0, and we only use one slot on each machine.
 
@@ -479,6 +515,7 @@ Number of Generation = 6 (1V)
 \end{center}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Processing Lateny}
 \vspace{-0.1in}
@@ -489,6 +526,7 @@ Sliding Window Size = 800 (1V)
     \end{center}
 \end{frame}
 
+
 \begin{frame}
 \frametitle{Processing Latency}
 \vspace{-0.1in}
@@ -498,6 +536,7 @@ Number of Generation = 6 (1V)
     	\includegraphics<1>[width=0.7\textwidth]{figs/III_1V_PL.png}
 \end{center}
 \end{frame}
+\end{comment}
 
 \begin{frame}
 \frametitle{Data Transmitted -- Sliding Window Size = 800}
@@ -511,6 +550,7 @@ MV
  	\includegraphics<1>[width=1\textwidth]{figs/II_MV_DT.png}
 \end{column}
 \end{columns}
+400 more data transmission without Bloom Filters.
 \end{frame}
 
 \begin{frame}
@@ -535,14 +575,30 @@ MV
 		\item Query Decomposition and Data Partition
 		\item Parallel and Distributed Query Planner
 		\item Continuous Join
-		\item Analysis
 		\item Implementation
 		\item Experiment Result
 		\item Conclusion
 	\end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Parallel and distributed join processing on RDF streams
+\item Distribute both data and queries
+\item Efficient
+\begin{itemize}
+\item Time 
+\begin{itemize}
+\item Execution Latency less than 600 ms
+\item Process Latency less than 1 ms
+\end{itemize}
+\item Space --- 400 times more efficient than without using Bloom FIlters
+\end{itemize}
+\end{itemize}
+\end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Conclusion}
 \vspace{-0.1in}
@@ -576,3 +632,4 @@ MV
 		\end{itemize}
 	\end{itemize}
 \end{frame}
+\end{comment}
