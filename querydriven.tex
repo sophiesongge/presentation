@@ -41,14 +41,9 @@
 \frametitle{Introduction --- RDF Data Model}
 \begin{itemize}
 \item \textbf{R}esource \textbf{D}escription \textbf{F}ramework is a data standard proposed by W3C
-\item It aims at representing semantic data in a machine understandable manner.
 \item This representation is used to describe semantic relations among data.
 \item Data items are expressed as triples in form of <subject, predicate, object> (e.g. <Sophie, hasSister, Ray>)
-\begin{itemize}
-\item The subject of a triple indicates the resource that this triple is about.
-\item The predicate refers to the property of the subject.
-\item The object denotes to the projection value of the subject by the predicate.
-\end{itemize}
+
 \end{itemize}
 \end{frame}
 
@@ -69,16 +64,16 @@
 
 \begin{frame}
 \frametitle{Introduction --- SPARQL Query Example}
-\textbf{Graph Representation: }
+\textbf{Graph Representation for SPARQL Query: }
 \vspace{-0.25in}
     \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/examplegraph.png}
     \end{center}
     \vspace{-0.25in}
-\textbf{Relational Representation:}
+\textbf{Graph Representation for RDF Data:}
 \vspace{-0.25in}
     \begin{center}
-    	\includegraphics<1>[width=0.5\textwidth]{figs/examplerelational.png}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/rdfgraph.png}
     \end{center}
 \end{frame}
 
@@ -119,6 +114,9 @@
 \item Replication of the boundary of each partition in order to reduce the transmission of data
 \end{itemize}
 \item Hash Partitioning based on indexes
+\begin{itemize}
+\item Too many indexes!!!
+\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -175,6 +173,13 @@ Too many indexes!!!
 
 \begin{frame}
 \frametitle{Sub-Query Scheduling}
+\begin{center}
+\includegraphics<1>[width=1\textwidth]{schedule.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sub-Query Scheduling}
 \textbf{Edge Coloring Method:} Maximize Parallelism
 \vspace{-0.2in}
     \begin{center}
@@ -185,11 +190,10 @@ Too many indexes!!!
 \begin{frame}
 \frametitle{Data Partitioning}
 \textbf{Partitioning Strategy: }The triples will be assigned to the nodes that hold the triple pattern with the same predicate.
-\begin{itemize}
-\item It does not require any index, and will not occupy more disk space.
-\item It can quickly adapt to changes in data, and it does not require any re-partitioning on
-the existing data when new data arrives or old data expires.
-\end{itemize}
+\vspace{-0.2in}
+\begin{center}
+    \includegraphics<1>[height=0.5\textwidth]{figs/dp.png}
+\end{center}
 \end{frame}
 
 
@@ -217,9 +221,23 @@ the existing data when new data arrives or old data expires.
 \end{frame}
 
 \begin{frame}
-\frametitle{Communication among nodes --- Bloom Filter}
+\frametitle{Communication}
+\begin{center}
+    \includegraphics<1>[height=0.6\textwidth]{figs/jointriple.png}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Communication}
 Do not send triples, send Bloom Filters
 \vspace{-0.2in}
+\begin{center}
+    \includegraphics<1>[height=0.55\textwidth]{figs/joinbloomfilter.png}
+ \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Communication among nodes --- Bloom Filter}
 \begin{center}
     \includegraphics<1>[height=0.5\textwidth]{figs/bloomfilter_1.png}
     \includegraphics<2>[height=0.5\textwidth]{figs/bloomfilter_2.png}    	
@@ -244,7 +262,7 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 
 \begin{frame}
 \frametitle{Bloom Filter --- Build and Probe}
-
+\vspace{-0.15in}
 \begin{itemize}
 
 \item \textbf{Builder: } inserts the results of the triple pattern to the Bloom Filter.
@@ -252,6 +270,14 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 \item \textbf{Prober: } checks the existence of the results of the triple pattern in the Bloom Filter
 
 \end{itemize}
+\vspace{-0.2in}
+\begin{center}
+    \includegraphics<1>[height=0.45\textwidth]{figs/builderprober.png}
+ \end{center}
+
+\end{frame}
+
+\begin{frame}
 \textbf{Question: } Which triple patterns should be \textbf{Builders}, and which ones should be \textbf{Probers}?
 \end{frame}
 
@@ -337,7 +363,7 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 \begin{frame}
 \frametitle{Continuous Join: Sliding Window + Sliding Bloom Filter}
     \begin{center}
-    	\includegraphics<1>[width=0.8\textwidth]{figs/16.png}
+    	\includegraphics<1>[width=0.7\textwidth]{figs/slidingjoin.png}
     \end{center}
 \end{frame}
 
@@ -468,13 +494,10 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 \item Synthetic data
 \begin{itemize}
 \item The RDF triples generated in Spouts are distributed to the nodes according to their predicate. 
-\item Two sub-sets of data are generated. The  first sub-set contains only the results of the join, and the second one contains only the non-results of the join.
 \end{itemize}
 \item LUBM Data 
 \begin{itemize}
-\item LUBM has 14 queries, and we have tested query No.1, query No.3, and query No.4
-\item It consists of a university domain. 
-\item It is customizable and repeatable.
+\item LUBM has 14 queries, and we have tested query No.1 (1-varialbe join), query No.3 (2-variable join), and query No.4 (multiple-variable join)
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -498,13 +521,33 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 \begin{frame}
 \frametitle{Execution Lateny}
 \vspace{-0.1in}
-Sliding Window Size = 800 (1V)
-\vspace{-0.2in}
-    \begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/II_1V_EL.png}
-    \end{center}
+Sliding Window Size = 800 (1-Variable Join)    
+    \begin{columns}
+\begin{column}{0.45\textwidth}
+More Generation $\Rightarrow$ Update more frequently $\Rightarrow$ Faster
+\end{column}
+\begin{column}{0.55\textwidth}
+ 		\includegraphics<1>[width=1.1\textwidth]{figs/II_1V_EL.png}
+\end{column}
+\end{columns} 
 \end{frame}
 
+\begin{frame}
+\frametitle{Execution Latency}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+2-Variable Join
+ 	\includegraphics<1>[width=1.2\textwidth]{figs/II_2V_EL.png}
+\end{column}
+\begin{column}{0.5\textwidth}
+Multiple-Variable Join
+ 	\includegraphics<1>[width=1.2\textwidth]{figs/II_MV_EL.png}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{comment}
 \begin{frame}
 \frametitle{Execution Latency}
 \vspace{-0.1in}
@@ -514,6 +557,8 @@ Number of Generation = 6 (1V)
     	\includegraphics<1>[width=0.7\textwidth]{figs/III_1V_EL.png}
 \end{center}
 \end{frame}
+\end{comment}
+
 
 \begin{comment}
 \begin{frame}
@@ -540,16 +585,11 @@ Number of Generation = 6 (1V)
 
 \begin{frame}
 \frametitle{Data Transmitted -- Sliding Window Size = 800}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-1V
- 	\includegraphics<1>[width=1\textwidth]{figs/II_1V_DT.png}
-\end{column}
-\begin{column}{0.5\textwidth}
-MV
- 	\includegraphics<1>[width=1\textwidth]{figs/II_MV_DT.png}
-\end{column}
-\end{columns}
+\textbf{Multiple-Variable Join}
+\vspace{-0.2in}
+\begin{center}
+\includegraphics<1>[width=0.6\textwidth]{figs/II_MV_DT.png}
+\end{center}
 400 more data transmission without Bloom Filters.
 \end{frame}
 
@@ -557,13 +597,7 @@ MV
 \frametitle{Accuracy}
 \textbf{We got 100\% correct results --- Surprise!}
 
-\begin{itemize}
-\item use p (false positive rate) and n (number of element to be inserted) to decide m (number of bits in the Bloom Filter)
-
-\item n is set to the number of elements received by the triple pattern
-
-\item the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern (far less than n)
-\end{itemize}
+The Bloom Filter is designed to contain all the received by the triple pattern, but it only contains the elements which match the triple pattern.
 
 %Because we use p and n to decide m. Each time n is set to the number of elements contained by each generation, but actually, the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern, which is much less then what we set. Since each time we set p to 0.05\%, which is rather small, we didn't get any false positive results in our experiments.
 \end{frame}

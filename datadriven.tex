@@ -1,18 +1,19 @@
 %!TEX root = presentazionelancia.tex
 \section{Part I: Data Driven Stream Join (kNN)}
 
-
+\begin{comment}
 \begin{frame}[t]
 \frametitle{Part I: Data Driven Stream Join (kNN)}
     \begin{center}
     	\includegraphics<1>[width=1\textwidth]{figs/knn.png}
     \end{center}
 \end{frame}
+\end{comment}
 
 
 
 \begin{frame}
-\frametitle{Outline}
+\frametitle{Part I: Data Driven Stream Join (kNN)}
 	\begin{itemize}
 		\item Introduction
 		\item Parallel Workflow
@@ -61,10 +62,6 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \begin{itemize}
 \item Sort -- Find the top k smallest distance for each element (Complexity: Quick Sort: $n \cdot log(n)$, Priority Queue: $log(n)$)
 \end{itemize}
-\vspace{-0.2in}
-    \begin{center}
-    	\includegraphics<1>[width=0.6\textwidth]{figs/quicksort.jpg}
-    \end{center}
 \end{frame}
 
 
@@ -80,7 +77,7 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 	\end{itemize}
 \end{frame}
 
-
+\begin{comment}
 \begin{frame}
 \frametitle{Parallel Workflow}
 \begin{itemize}
@@ -100,6 +97,14 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \item \textcolor{blue!20}{Two Rounds jobs}
 \end{itemize}
 \end{itemize}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+\frametitle{Parallel Workflow --- Survey}
+\begin{center}
+	\includegraphics<1>[width=1\textwidth]{figs/pw1.png}
+\end{center}
 \end{frame}
 
 
@@ -167,6 +172,7 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
 \end{frame}
 \end{comment}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Parallel Workflow}
 \begin{itemize}
@@ -187,12 +193,21 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
 \end{itemize}
 \end{itemize}
 \end{frame}
+\end{comment}
+
+\begin{frame}
+\frametitle{Parallel Workflow --- Survey}
+\begin{center}
+	\includegraphics<1>[width=1\textwidth]{figs/pw2.png}
+\end{center}
+\end{frame}
 
 
 \begin{frame}
 \frametitle{Data Partitioning --- Basic Idea (Block Nested Loop)}
+\vspace{-0.1in}
     \begin{center}
-    	\includegraphics<1>[width=0.4\textwidth]{figs/randompartition.png}
+    	\includegraphics<1>[width=0.5\textwidth]{figs/randompartition.png}
     \end{center}
     \vspace{-0.3in}
     \textcolor{red}{Problem: } $n^2$ tasks for calculating pairwise distances; wastes a lot of hardware resources, and ultimately leads to low efficiency.
@@ -231,14 +246,14 @@ This strategy wants to have the most relevant points in each partition.
 \end{itemize}
 \end{column}
 \begin{column}{0.55\textwidth}
- 	\includegraphics<1>[width=1\textwidth]{figs/V1.png}
- 	\includegraphics<2>[width=1\textwidth]{figs/V2.png}
- 	\includegraphics<3>[width=1\textwidth]{figs/V3.png}
- 	\includegraphics<4>[width=1\textwidth]{figs/V4.png}
- 	\includegraphics<5>[width=1\textwidth]{figs/V5.png}
+ 	\includegraphics<1>[width=1\textwidth]{figs/vo1.png}
+ 	\includegraphics<2>[width=1\textwidth]{figs/vo2.png}
+ 	%\includegraphics<3>[width=1\textwidth]{figs/V3.png}
+ 	%\includegraphics<4>[width=1\textwidth]{figs/V4.png}
+ 	%\includegraphics<5>[width=1\textwidth]{figs/V5.png}
 \end{column}
 \end{columns} 
-   
+Take neighbor cells
 \end{frame}
 
 \begin{frame}
@@ -259,7 +274,7 @@ This strategy wants to make each partition have equal size in order to achieve a
  	\includegraphics<3>[width=1\textwidth]{figs/Z3.png}
 \end{column}
 \end{columns} 
-
+Take 3 partitions
 \end{frame}
 
 \begin{frame}
@@ -267,12 +282,20 @@ This strategy wants to make each partition have equal size in order to achieve a
     \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/lshpartition.png}
     \end{center}
+    Take neighbor buckets
+\end{frame}
+
+\begin{frame}
+\frametitle{Parallel Workflow --- Survey}
+ \begin{center}
+    	\includegraphics<1>[width=1\textwidth]{figs/workflow.png}
+    \end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{Computation}
 \begin{itemize}
-\item One job --- Direct give the global results
+\item One job --- Directly give the global results
 \item Two consecutive jobs --- First give the local results, then merge the local results into the global results
 \end{itemize}
 
@@ -281,7 +304,7 @@ This strategy wants to make each partition have equal size in order to achieve a
 
 \begin{frame}
 \frametitle{Computation --- Example}
-For each city in $R$, find the nearest city in $S$.
+For each city in $R$, find the nearest city in $S$. (1-NN)
 	\includegraphics<1>[width=0.6\textwidth]{figs/france.jpg}
 \end{frame}
 
@@ -301,12 +324,7 @@ For each city in $R$, find the nearest city in $S$.
     \end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{Workflow}
- \begin{center}
-    	\includegraphics<1>[width=1\textwidth]{figs/workflow.png}
-    \end{center}
-\end{frame}
+
 
 \begin{frame}
 \frametitle{Outline}
@@ -350,11 +368,15 @@ then $\left| R_i \right|$ $\times$ $\left| S_i \right|$ $\approx$ $\left| R_j \r
 \frametitle{Load Balance}
 \vspace{-0.1in}
 \begin{block}{if $\left| R_i \right|$ = $\left| R_j \right|$, the Worst Case Complexity is:}
-$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\frac{\left|R\right|}{p} \times log\left|S\right|\right)$
+\begin{center}
+$ \mathcal{O}\left(\frac{\left|R\right|}{p} \times log\left|S\right|\right)$
+\end{center}
 \end{block}
 \vspace{-0.2in}
 \begin{block}{if $\left| S_i \right|$ = $\left| S_j \right|$, the Worst Case Complexity is:}
-$\mathcal{O}\left(\left|R_i\right| \times log\left|S_i\right|\right) = \mathcal{O}\left(\left|R\right|\times log\frac{\left|S\right|}{p}\right)$
+\begin{center}
+$ \mathcal{O}\left(\left|R\right|\times log\frac{\left|S\right|}{p}\right)$
+\end{center}
 \end{block}
 \vspace{-0.2in}
 $p$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right|$ is better.
@@ -364,7 +386,7 @@ $p$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right
 
 \begin{frame}
 \frametitle{Accuracy}
-The lack of accuracy is the direct consequence of techniques to reduce the dimensionality with techniques of as z-values and LSH.
+Accuracy: the number of correct results we get in the end.
 \begin{itemize}
 \item \textbf{Z-Value}
 \begin{itemize}
@@ -486,6 +508,7 @@ Maintaining a moving window of the most recent elements in the stream
 \begin{itemize}
 \item[-] Most used scenario in real applications
 \item[-] Reuse Random Partition method
+\item[-] Find restaurant for moving users
 \end{itemize}
 \item Dynamic R and Dynamic S (DRDS)
 \begin{itemize}
@@ -505,7 +528,7 @@ Maintaining a moving window of the most recent elements in the stream
 
 \begin{frame}
 \frametitle{Dynamic R and Dynamic S --- Advanced Method (Naive Bayes Partitioning)}
-\textbf{n tasks for each generation: }partition the new data items without moving the old ones.
+\textbf{n tasks for each generation: }partition the new data items without re-partition the old ones.
 \vspace{-0.2in}
 \begin{block}{Naive Bayes Theory}
 Given two independent events A and x, the conditional probability of given x and A occurs is:
@@ -569,17 +592,14 @@ $P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and t
 \textbf{Cluster Setting}
 \vspace{-0.1in}
 \begin{itemize}
-\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3
+\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3 (3 replications, 1 slot per node)
 
-\item The number of replications for each split of data is set to 3
-
-\item The number of slots of each node is 1
 \end{itemize}
 \textbf{Datasets}
 \vspace{-0.1in}
 \begin{itemize}
 \item \textbf{OpenStreetMap} Geo dataset contains geographic XML data in two dimensions  --- Low Dimension
-\item \textbf{Catech 101} It is a public set of images, which contains 101 categories of pictures of different objects. (Speeded Up Robust Features --- 128 dimensions) --- High Dimension
+\item \textbf{Caltech 101} It is a public set of images, which contains 101 categories of pictures of different objects. (Speeded Up Robust Features --- 128 dimensions) --- High Dimension
 \end{itemize}
 \end{frame}
 
