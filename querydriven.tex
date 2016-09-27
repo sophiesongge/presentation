@@ -1,17 +1,12 @@
 %!TEX root = presentazionelancia.tex
 \section{Part II: Query Driven Stream Join (RDF)}
-\begin{frame}[t]
-\frametitle{Part II: Query Driven Stream Join (RDF)}
-    \begin{center}
-    	\includegraphics<1>[width=1\textwidth]{figs/semanticweb.jpg}
-    \end{center}
-\end{frame}
+
 
 
 
 
 \begin{frame}
-\frametitle{Outline}
+\frametitle{Part II: Query Driven Stream Join (RDF)}
 	\begin{itemize}
 		\item Introduction
 		\item Query Decomposition and Data Partition
@@ -40,9 +35,9 @@
 \begin{frame}
 \frametitle{Introduction --- RDF Data Model}
 \begin{itemize}
-\item \textbf{R}esource \textbf{D}escription \textbf{F}ramework is a data standard proposed by W3C
-\item This representation is used to describe semantic relations among data.
-\item Data items are expressed as triples in form of <subject, predicate, object> (e.g. <Sophie, hasSister, Ray>)
+\item \textbf{R}esource \textbf{D}escription \textbf{F}ramework 
+\item Describe semantic relations among data.
+\item Triples in form of <subject, predicate, object> (e.g. <Sophie, hasSister, Ray>)
 
 \end{itemize}
 \end{frame}
@@ -77,13 +72,6 @@
     \end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{Query Driven Join}
-\begin{itemize}
-\item Data format does not change
-\item Query changes
-\end{itemize}
-\end{frame}
 
 \begin{frame}
 \frametitle{Related Works --- 4 Types of Processing}
@@ -115,24 +103,12 @@
 \end{itemize}
 \item Hash Partitioning based on indexes
 \begin{itemize}
-\item Too many indexes!!!
+\item Too many indexes ( up to 15)
 \end{itemize}
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Hash Partitioning --- Index}
-\begin{columns}
-\begin{column}{0.45\textwidth}
-Too many indexes!!!
-\end{column}
-\begin{column}{0.55\textwidth}
-    	\includegraphics<1>[width=1\textwidth]{figs/rdf3x.png}
-\end{column}
-\end{columns}
-\vspace{0.1in}
-    \tiny{RDF-3X: a risc-style engine for RDF, PVLDB 2008, Thomas Neumann et. al.}
-\end{frame}
+
 
 \begin{frame}
 \frametitle{General Distributed Processing Steps}
@@ -160,21 +136,16 @@ Too many indexes!!!
 \begin{frame}
 \frametitle{Query Decomposition}
 \textbf{Decomposition Strategy: }Divide the queries into triple patterns, send each triple pattern to different machines.
-\begin{itemize}
-\item It is simple, and does not require any complicated computations.
-%\item The sub-streams can be easily assigned to the sub-queries.
-\item The performance or accuracy of this method does not depend on the index or replication of data.
-\item The number of triple patterns is limited
-
-%Among the triples processed by a query, the number of different subjects or objects involved could be tens of thousands; But the number of triple patterns is a limited and  fixed number.
-\end{itemize}
+\begin{center}
+\includegraphics<1>[width=1\textwidth]{decomposequery.png}
+\end{center}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Sub-Query Scheduling}
 \begin{center}
-\includegraphics<1>[width=1\textwidth]{schedule.png}
+\includegraphics<1>[width=1\textwidth]{scheduling.png}
 \end{center}
 \end{frame}
 
@@ -183,7 +154,7 @@ Too many indexes!!!
 \textbf{Edge Coloring Method:} Maximize Parallelism
 \vspace{-0.2in}
     \begin{center}
-    	\includegraphics<1>[width=0.5\textwidth]{figs/17.png}
+    	\includegraphics<1>[width=1\textwidth]{figs/edgecoloring.png}
     \end{center}
 \end{frame}
 
@@ -223,13 +194,14 @@ Too many indexes!!!
 \begin{frame}
 \frametitle{Communication}
 \begin{center}
-    \includegraphics<1>[height=0.6\textwidth]{figs/jointriple.png}
+    \includegraphics<1>[width=0.75\textwidth]{figs/jointriple.png}
  \end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{Communication}
-Do not send triples, send Bloom Filters
+\vspace{-0.1in}
+Do not send triples, send a function saying that we already met these triples
 \vspace{-0.2in}
 \begin{center}
     \includegraphics<1>[height=0.55\textwidth]{figs/joinbloomfilter.png}
@@ -238,6 +210,7 @@ Do not send triples, send Bloom Filters
 
 \begin{frame}
 \frametitle{Communication among nodes --- Bloom Filter}
+
 \begin{center}
     \includegraphics<1>[height=0.5\textwidth]{figs/bloomfilter_1.png}
     \includegraphics<2>[height=0.5\textwidth]{figs/bloomfilter_2.png}    	
@@ -247,7 +220,9 @@ Do not send triples, send Bloom Filters
     \includegraphics<6>[height=0.5\textwidth]{figs/bloomfilter_6.png}
     \includegraphics<7>[height=0.5\textwidth]{figs/bloomfilter_7.png}
  %   \includegraphics<8>[height=0.5\textwidth]{figs/bloomfilter_8.png}
+
 \end{center}
+
 \end{frame}
 
 \begin{frame}
@@ -265,9 +240,9 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 \vspace{-0.15in}
 \begin{itemize}
 
-\item \textbf{Builder: } inserts the results of the triple pattern to the Bloom Filter.
+\item \textbf{Builder: } create bloom filters.
 
-\item \textbf{Prober: } checks the existence of the results of the triple pattern in the Bloom Filter
+\item \textbf{Prober: } use bloom filters
 
 \end{itemize}
 \vspace{-0.2in}
@@ -325,8 +300,14 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 \end{frame}
 
 \begin{frame}
-\frametitle{The order of sending and receiving information}
+\frametitle{Sending and Receiving orders}
 \textbf{Rule 4: Query Topological Sort}
+
+\textbf{Purpose: } Find the dependencies for each variable
+
+%\textbf{Builder, Prober Chain}
+
+
 \begin{block}{Query Topological Sort}
 \textbf{Query Topological Sort} is a topological sort for the query graphs, where the constant nodes on the graph have higher priority than the variable nodes at the same level.
 \end{block}
@@ -362,9 +343,15 @@ p = $(1-e^{-\frac{nk}{m}})^k$
 
 \begin{frame}
 \frametitle{Continuous Join: Sliding Window + Sliding Bloom Filter}
-    \begin{center}
-    	\includegraphics<1>[width=0.7\textwidth]{figs/slidingjoin.png}
-    \end{center}
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+   	\includegraphics<1>[width=1\textwidth]{figs/12.png}
+\end{column}
+\begin{column}{0.5\textwidth}
+    	\includegraphics<1>[width=1\textwidth]{figs/slidingjoin.png}
+\end{column}
+\end{columns}
 \end{frame}
 
 \begin{comment}
@@ -486,21 +473,15 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 \item Apache Jena API is used for reading triples.
 \end{itemize}
 
-\end{frame}
-
-\begin{frame}
-\frametitle{Data sets}
 \begin{itemize}
 \item Synthetic data
 \begin{itemize}
 \item The RDF triples generated in Spouts are distributed to the nodes according to their predicate. 
 \end{itemize}
-\item LUBM Data 
-\begin{itemize}
-\item LUBM has 14 queries, and we have tested query No.1 (1-varialbe join), query No.3 (2-variable join), and query No.4 (multiple-variable join)
 \end{itemize}
-\end{itemize}
+
 \end{frame}
+
 
 \begin{comment}
 \begin{frame}
@@ -526,7 +507,7 @@ Idea: p reaches the minimum value, when the derivation of p reaches 0.
 Sliding Window Size = 800 (1-Variable Join)    
     \begin{columns}
 \begin{column}{0.45\textwidth}
-More Generation $\Rightarrow$ Update more frequently $\Rightarrow$ Faster
+More Generations $\Rightarrow$ More frequent updates $\Rightarrow$ Faster
 \end{column}
 \begin{column}{0.55\textwidth}
  		\includegraphics<1>[width=1.1\textwidth]{figs/II_1V_EL.png}
@@ -590,16 +571,16 @@ Number of Generation = 6 (1V)
 \textbf{Multiple-Variable Join}
 \vspace{-0.2in}
 \begin{center}
-\includegraphics<1>[width=0.6\textwidth]{figs/II_MV_DT.png}
+\includegraphics<1>[width=0.8\textwidth]{figs/II_MV_DT.png}
 \end{center}
-400 more data transmission without Bloom Filters.
+
 \end{frame}
 
 \begin{frame}
 \frametitle{Accuracy}
 \textbf{We got 100\% correct results --- Surprise!}
 
-The Bloom Filter is designed to contain all the received by the triple pattern, but it only contains the elements which match the triple pattern.
+Large Bloom Filters but very few matching elements.
 
 %Because we use p and n to decide m. Each time n is set to the number of elements contained by each generation, but actually, the real number of elements inserted into the Bloom Filter should be the number of results which match the triple pattern, which is much less then what we set. Since each time we set p to 0.05\%, which is rather small, we didn't get any false positive results in our experiments.
 \end{frame}
@@ -627,7 +608,6 @@ The Bloom Filter is designed to contain all the received by the triple pattern, 
 \item Time 
 \begin{itemize}
 \item Execution Latency less than 600 ms
-\item Process Latency less than 1 ms
 \end{itemize}
 \item Space --- 400 times more efficient than without using Bloom FIlters
 \end{itemize}

@@ -16,10 +16,13 @@
 \frametitle{Part I: Data Driven Stream Join (kNN)}
 	\begin{itemize}
 		\item Introduction
+		\item Survey about Parallel Solutions on MapReduce
+		\begin{itemize}
 		\item Parallel Workflow
 		\item Theoretical Analysis
-		\item Continuous kNN
 		\item Experiment Result
+		\end{itemize}
+		\item Continuous kNN
 		\item Conclusion
 	\end{itemize}
 \end{frame}
@@ -29,10 +32,13 @@
 \frametitle{Outline}
 	\begin{itemize}
 		\item Introduction
+		\item \textcolor{blue!20}{Survey about Parallel Solutions}
+		\begin{itemize}
 		\item \textcolor{blue!20}{Parallel Workflow}
 		\item \textcolor{blue!20}{Theoretical Analysis}
-		\item \textcolor{blue!20}{Continuous kNN}
 		\item \textcolor{blue!20}{Experiment Result}
+		\end{itemize}
+		\item \textcolor{blue!20}{Continuous kNN}
 		\item \textcolor{blue!20}{Conclusion}
 	\end{itemize}
 \end{frame}
@@ -43,16 +49,38 @@
 \begin{block}{Definition: kNN}
 Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$ nearest neighbor join} is an operation which, for each point in $R$, discovers the $k$ nearest neighbors in $S$. 
 \end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{An Example of kNN Join}
+For each city in $R$, find the nearest city in $S$. (1-NN)
+
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+ 	\includegraphics<1>[width=1.2\textwidth]{figs/france.jpg}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+\item \textbf{R: }Query Set
+\item \textbf{S: }Reference Set
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}
 \begin{itemize}
 \item Query never changes
-\item Data changes: GPS (2 Dimensions), Twitter (77 Dimensions), Images (128 Dimensions) etc.
+\item Data format changes: GPS (2 Dimensions), Twitter (77 Dimensions), Images (128 Dimensions) etc.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Introduction: Basic Idea}
 \begin{itemize}
-\item Nested Loop -- Calculate the Distances (Complexity $O(n^2)$)
+\item Nested Loop -- Calculate the Distances 
 \end{itemize}
 \vspace{-0.3in}
     \begin{center}
@@ -60,8 +88,10 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
     \end{center}
 \vspace{-0.3in}
 \begin{itemize}
-\item Sort -- Find the top k smallest distance for each element (Complexity: Quick Sort: $n \cdot log(n)$, Priority Queue: $log(n)$)
+\item Sort -- Find the top k smallest distance for each element 
 \end{itemize}
+
+\textcolor{red}{Problem: Data Intensive and Computation Intensive}
 \end{frame}
 
 
@@ -69,10 +99,13 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \frametitle{Outline}
 	\begin{itemize}
 		\item Introduction
+		\item Survey about Parallel Solutions
+		\begin{itemize}
 		\item Parallel Workflow
-		\item \textcolor{blue!20}{Theoretical Analysis}
+		\item Theoretical Analysis
+		\item Experiment Result
+		\end{itemize}
 		\item \textcolor{blue!20}{Continuous kNN}
-		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
 	\end{itemize}
 \end{frame}
@@ -100,24 +133,44 @@ Given a set of query points $R$ and a set of reference points $S$, a \textbf{$k$
 \end{frame}
 \end{comment}
 
+
 \begin{frame}
-\frametitle{Parallel Workflow --- Survey}
+\frametitle{First Result: Parallel Workflow}
+
 \begin{center}
-	\includegraphics<1>[width=1\textwidth]{figs/pw1.png}
+	\includegraphics<1>[width=1\textwidth]{figs/pw0.png}
 \end{center}
 \end{frame}
 
 
+
 \begin{frame}
-\frametitle{Data Preprocessing --- Reducing the dimension of data}
-Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension while preserving the locality information
-    \vspace{-0.2in}
-    \begin{center}
-    	\includegraphics<1>[width=0.5\textwidth]{figs/z-value.png}
-    \end{center}
-   \tiny{ [z-value]:  Efficient parallel kNN joins for large data in MapReduce, EDBT 2012,  Chi Zhang et. al.}
+\frametitle{Data Preprocessing : Reduce the dimension of data}
+\textbf{The curse of dimensionality: } Too difficult to calculate in high dimension space.
+
+\textbf{Solution: } Project data from high dimension space to a low dimension one while preserving the locality information
 \end{frame}
 
+\begin{frame}
+\frametitle{Data Preprocessing --- Reducing the dimension of data}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Space Filling Curve (Z-Value)}
+ 	 	\includegraphics<1>[width=0.6\textwidth]{figs/z-value.png}
+\end{column}
+
+\begin{column}{0.6\textwidth}
+\textbf{LSH: Locality Sensitive Hashing}
+\includegraphics<1>[width=0.7\textwidth]{figs/LSH.png}
+\end{column}
+\end{columns}
+\vspace{0.1in}
+ \tiny{ [z-value]:  Efficient parallel kNN joins for large data in MapReduce, EDBT 2012,  Chi Zhang et. al.}
+ 
+  \tiny{[LSH]:  RankReduce - processing K-Nearest Neighbor queries on top of MapReduce, LSDS-IR 2010, Aleksandar Stupar et. al.}
+\end{frame}
+
+\begin{comment}
 \begin{frame}[t]
 \frametitle{Data Preprocessing --- Reducing the dimension of data}
 	Locality Sensitive Hashing (LSH) --- Map the neighbor points into the same buckets with a high probability using Hash Families
@@ -127,6 +180,7 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
     \end{center}
     \tiny{[LSH]:  RankReduce - processing K-Nearest Neighbor queries on top of MapReduce, LSDS-IR 2010, Aleksandar Stupar et. al.}
 \end{frame}
+\begin{comment}
 
 \begin{comment}
 \begin{frame}
@@ -141,6 +195,10 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
 \end{frame}
 \end{comment}
 
+
+
+
+\begin{comment}
 \begin{frame}
 \frametitle{Data Preprocessing --- Selecting central points (Pivots) of data clusters}
 \textbf{Voronoi Diagrams: }
@@ -158,6 +216,8 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
 \end{columns}
 \tiny{[voronoi]: Efficient Processing of k Nearest Neighbor Joins using MapReduce, VLDB 2012, Wei Lu et. al.}
 \end{frame}
+\begin{comment}
+
 
 \begin{comment}
 \begin{frame}
@@ -196,10 +256,28 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
 \end{comment}
 
 \begin{frame}
-\frametitle{Parallel Workflow --- Survey}
+\frametitle{Parallel Workflow}
 \begin{center}
-	\includegraphics<1>[width=1\textwidth]{figs/pw2.png}
+	\includegraphics<1>[width=1\textwidth]{figs/pw1.png}
 \end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Data Partitioning}
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+ 	 		\includegraphics<1>[width=0.8\textwidth]{figs/datapartition.png}
+
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\textbf{Purpose: } Cut big data sets into smaller ones
+\end{column}
+\end{columns}
+
 \end{frame}
 
 
@@ -213,9 +291,10 @@ Space Filling Curve (Z-Value) --- Project high dimensional data to 1 dimension w
     \textcolor{red}{Problem: } $n^2$ tasks for calculating pairwise distances; wastes a lot of hardware resources, and ultimately leads to low efficiency.
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Data Partitioning --- Motivation}
-The key to improve the performance is to preserve spatial locality of objects when decomposing data for tasks.
+The key to improve the performance is to preserve locality of objects when decomposing data for tasks.
     \begin{center}
     	\includegraphics<1>[width=0.6\textwidth]{figs/join1.png}
     \end{center}
@@ -224,9 +303,13 @@ The key to improve the performance is to preserve spatial locality of objects wh
     	\includegraphics<1>[width=0.8\textwidth]{figs/join2.png}
     \end{center}
 \end{frame}
+\end{comment}
+
 
 \begin{frame}
 \frametitle{Data Partitioning --- Motivation}
+\textbf{Purpose: } Reduce the task number from $n^2$ to n
+\vspace{-0.2in}
     \begin{center}
     	\includegraphics<1>[width=0.8\textwidth]{figs/advancedpartition.png}
     \end{center}
@@ -239,10 +322,8 @@ This strategy wants to have the most relevant points in each partition.
 \begin{columns}
 \begin{column}{0.45\textwidth}
  	\begin{itemize}
-\item[1] Selection Pivots in R
-\item[2] Partition R
-\item[3] Upper Bound in R
-\item[4] Find corresponding partition in S for each R
+\item[1] Partition Query Set R
+\item[2] Use same diagrams to partition S
 \end{itemize}
 \end{column}
 \begin{column}{0.55\textwidth}
@@ -257,14 +338,14 @@ Take neighbor cells
 \end{frame}
 
 \begin{frame}
-\frametitle{Data Partitioning --- Size Based Partitioning Strategy --- Z-Value}
+\frametitle{Data Partitioning --- Size Based Partitioning Strategy --- Z-Value (or LSH)}
 This strategy wants to make each partition have equal size in order to achieve a good load balance.
 
 \begin{columns}
 \begin{column}{0.45\textwidth}
  	\begin{itemize}
 \item[1] A Sample of R
-\item[2] Find Quantiles in the Sample as the Bounds of the Partitions in R
+\item[2] Partition the sample into equal sized partitions
 \item[3] Find corresponding partition in S for each R
 \end{itemize}
 \end{column}
@@ -276,7 +357,14 @@ This strategy wants to make each partition have equal size in order to achieve a
 \end{columns} 
 Take 3 partitions
 \end{frame}
+\begin{frame}
+\frametitle{Parallel Workflow}
+\begin{center}
+	\includegraphics<1>[width=1\textwidth]{figs/pw2.png}
+\end{center}
+\end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Data Partitioning --- Size Based Partitioning Strategy --- LSH}
     \begin{center}
@@ -284,13 +372,9 @@ Take 3 partitions
     \end{center}
     Take neighbor buckets
 \end{frame}
+\end{comment}
 
-\begin{frame}
-\frametitle{Parallel Workflow --- Survey}
- \begin{center}
-    	\includegraphics<1>[width=1\textwidth]{figs/workflow.png}
-    \end{center}
-\end{frame}
+
 
 \begin{frame}
 \frametitle{Computation}
@@ -299,7 +383,7 @@ Take 3 partitions
 \item Two consecutive jobs --- First give the local results, then merge the local results into the global results
 \end{itemize}
 
-\textbf{Purpose: } using multiple rounds of jobs in order to reduce the number of elements to be sorted.
+\textbf{Purpose: } reduce the number of elements to be sorted.
 \end{frame}
 
 \begin{frame}
@@ -324,25 +408,47 @@ For each city in $R$, find the nearest city in $S$. (1-NN)
     \end{center}
 \end{frame}
 
-
+\begin{frame}
+\frametitle{Parallel Workflow}
+ \begin{center}
+    	\includegraphics<1>[width=1\textwidth]{figs/workflow.png}
+    \end{center}
+\end{frame}
 
 \begin{frame}
-\frametitle{Outline}
-	\begin{itemize}
-		\item Introduction
-		\item Parallel Workflow
-		\item Theoretical Analysis
+\frametitle{Result 2: Theoretical Analysis}
+
 		\begin{itemize}
 \item Load Balance
 \item Accuracy
 \item Complexity
 \end{itemize}
-		\item \textcolor{blue!20}{Continuous kNN}
-		\item \textcolor{blue!20}{Experiment Result}
-		\item \textcolor{blue!20}{Conclusion}
-	\end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Load Balance}
+ 	\begin{center}
+    	\includegraphics<1>[width=0.6\textwidth]{figs/lb.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sub-Optimal Load Balance}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{(1) Partition R into equal-sized}
+ 	\includegraphics<1>[width=1\textwidth]{figs/rpartition.png}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{(2) Partition S into equal-sized}
+ 	\includegraphics<1>[width=1\textwidth]{figs/spartition.png}
+\end{column}
+\end{columns}
+\textcolor{red}{(1) is better in the worst case.}
+\end{frame}
+
+
+\begin{comment}
 \begin{frame}
 \frametitle{Load Balance}
 \begin{block}{What is Load Balance?}
@@ -362,8 +468,10 @@ then $\left| R_i \right|$ $\times$ $\left| S_i \right|$ $\approx$ $\left| R_j \r
 \end{block}
 
 \end{frame}
+\end{comment}
 
 
+\begin{comment}
 \begin{frame}
 \frametitle{Load Balance}
 \vspace{-0.1in}
@@ -383,6 +491,7 @@ $p$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right
 
 \textcolor{red}{All advanced partitioning strategies first partition R into equal sized partitions, then find the corresponding S for each R.}
 \end{frame}
+\end{comment}
 
 \begin{frame}
 \frametitle{Accuracy}
@@ -415,18 +524,91 @@ Accuracy: the number of correct results we get in the end.
 \end{itemize}
 \end{frame}
 
+
 \begin{frame}
-\frametitle{Main Overhead }
+\frametitle{Result 3: Experimental Analysis}
+\textbf{Cluster Setting}
+\vspace{-0.1in}
 \begin{itemize}
-\item Communication overhead:
-\begin{itemize}
-\item the amount of data transmitted over the network
+\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3 (3 replications, 1 slot per node)
+
 \end{itemize}
-\item Computation overhead:
+\textbf{Datasets}
+\vspace{-0.1in}
 \begin{itemize}
-\item computing the distances
-\item finding the k smallest distances
+\item \textbf{OpenStreetMap} Geo dataset contains geographic XML data in two dimensions  --- Low Dimension
+\item \textbf{Caltech 101} It is a public set of images, which contains 101 categories of pictures of different objects. (Speeded Up Robust Features --- 128 dimensions) --- High Dimension
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Methods Evaluated}
+\begin{itemize}
+\item \textbf{H-BkNNJ} Naive Method -- Without preprocessing and partitioning -- One Job
+\item \textbf{H-BNLJ} Block Nested Loop -- Without preprocessing and partitioning -- Two Jobs
+\item \textbf{PGBJ} Based on Voronoi -- Preprocessing: Select Pivots -- Distance Based Partitioning -- One Job
+\item \textbf{H-zkNNJ} Based on Z-Value -- Preprocessing: z-value -- Size Based Partitioning -- Two Jobs
+\item \textbf{RankReduce} Based on LSH -- Preprocessing: LSH -- Size Based Partitioning -- Two Jobs
+\end{itemize}
+\end{frame}
+
+\begin{comment}
+\begin{frame}
+\frametitle{Evaluations}
+\textbf{Impacts:  (x axis)}
+\begin{itemize}
+\item Impact of input data size
+\item Impact of k
+\item Impact of Dimension and Dataset
+\end{itemize}
+\textbf{Measures: (y axis)}
+\begin{itemize}
+\item Execution Time
+\item Communication Overhead
+\item Recall and Precision
+\end{itemize}
+\textbf{Practical Analysis}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+\frametitle{Evaluation Result --- Verify the theoretical Analysis}
+Execution Time for Geo dataset (2 dimensions): 
+
+\begin{columns}
+\begin{column}{0.45\textwidth}
+\includegraphics<1>[width=1\textwidth]{figs/method.png}
+\end{column}
+\begin{column}{0.55\textwidth}
+\includegraphics<1>[width=1.2\textwidth]{figs/time.pdf}
+\end{column}
+\end{columns} 
+\end{frame}
+
+\begin{frame}
+\frametitle{Evaluation Result --- Surprise}
+Execution Time for Image dataset (128 dimensions):
+\begin{columns}
+\begin{column}{0.45\textwidth}
+\includegraphics<1>[width=1\textwidth]{figs/method.png}
+\end{column}
+\begin{column}{0.55\textwidth}
+	\includegraphics<1>[width=1.2\textwidth]{figs/time_surf.pdf}
+\end{column}
+\end{columns} 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Conclusions of the survey}
+\begin{itemize}
+\item Clear and detailed view of the current algorithms for processing kNN on MapReduce
+
+\item A fine grained analysis both theoretical and experimental for each algorithm to obtain the best performance.
+\end{itemize}
+\textbf{Limitation of the existing algorithms}
+\begin{itemize}
+\item Non of them can process data streams
 \end{itemize}
 \end{frame}
 
@@ -434,10 +616,13 @@ Accuracy: the number of correct results we get in the end.
 \frametitle{Outline}
 	\begin{itemize}
 		\item Introduction
+		\item Survey about Parallel Solutions
+		\begin{itemize}
 		\item Parallel Workflow
 		\item Theoretical Analysis
+		\item Experiment Result
+		\end{itemize}
 		\item Continuous kNN
-		\item \textcolor{blue!20}{Experiment Result}
 		\item \textcolor{blue!20}{Conclusion}
 	\end{itemize}
 \end{frame}
@@ -445,7 +630,7 @@ Accuracy: the number of correct results we get in the end.
 \begin{frame}
 \frametitle{Sliding Window Model --- Motivation}
 \begin{itemize}
-\item Unbounded streams can not be wholly stored in bounded memory
+\item Unbounded sequence of elements which can not be wholly stored in bounded memory
 \item New items in a stream are more relevant than older ones.
 \end{itemize}
 \vspace{-0.2in}
@@ -506,13 +691,16 @@ Maintaining a moving window of the most recent elements in the stream
 \end{itemize}
 \item Dynamic R and Static S (DRSS)
 \begin{itemize}
+
 \item[-] Most used scenario in real applications
+\item[-] Example: find restaurant for moving users
 \item[-] Reuse Random Partition method
-\item[-] Find restaurant for moving users
+
 \end{itemize}
 \item Dynamic R and Dynamic S (DRDS)
 \begin{itemize}
 \item[-] General situation
+\item[-] Example: find Pokémon for moving players
 \item[-] Basic Method + Advanced Method
 \end{itemize}
 \end{itemize}
@@ -528,16 +716,14 @@ Maintaining a moving window of the most recent elements in the stream
 
 \begin{frame}
 \frametitle{Dynamic R and Dynamic S --- Advanced Method (Naive Bayes Partitioning)}
-\textbf{n tasks for each generation: }partition the new data items without re-partition the old ones.
-\vspace{-0.2in}
-\begin{block}{Naive Bayes Theory}
-Given two independent events A and x, the conditional probability of given x and A occurs is:
-\begin{equation}
-P(A|x) = \frac{P(x|A) \cdot P(A)}{P(x)}
-\end{equation}
-\end{block}
-\vspace{-0.2in}
-The new data x will be partitioned to the partition with the highest conditional probability.
+\textbf{Purpose: n tasks for each generation: }
+\begin{itemize}
+\item Partition new data items
+
+\item No time to repartition old ones
+\end{itemize}
+\textbf{Solution: } Classification for new data items based on Naive Bayes Theory
+
 \end{frame}
 
 \begin{comment}
@@ -575,103 +761,7 @@ $P(l_j(x)|N_i)$ is the probability of the appearance of $l_j(x)$ on $N_i$, and t
 \end{comment}
 
 
-\begin{frame}
-\frametitle{Outline}
-	\begin{itemize}
-		\item Introduction
-		\item Parallel Workflow
-		\item Theoretical Analysis
-		\item Continuous kNN
-		\item Experiment Result
-		\item \textcolor{blue!20}{Conclusion}
-	\end{itemize}
-\end{frame}
 
-\begin{frame}
-\frametitle{Experiment Setting}
-\textbf{Cluster Setting}
-\vspace{-0.1in}
-\begin{itemize}
-\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3 (3 replications, 1 slot per node)
-
-\end{itemize}
-\textbf{Datasets}
-\vspace{-0.1in}
-\begin{itemize}
-\item \textbf{OpenStreetMap} Geo dataset contains geographic XML data in two dimensions  --- Low Dimension
-\item \textbf{Caltech 101} It is a public set of images, which contains 101 categories of pictures of different objects. (Speeded Up Robust Features --- 128 dimensions) --- High Dimension
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Methods Evaluated}
-\begin{itemize}
-\item \textbf{H-BkNNJ} Naive Method -- Without preprocessing and partitioning -- One Job
-\item \textbf{H-BNLJ} Block Nested Loop -- Without preprocessing and partitioning -- Two Jobs
-\item \textbf{PGBJ} Based on Voronoi -- Preprocessing: Select Pivots -- Distance Based Partitioning -- One Job
-\item \textbf{H-zkNNJ} Based on Z-Value -- Preprocessing: z-value -- Size Based Partitioning -- Two Jobs
-\item \textbf{RankReduce} Based on LSH -- Preprocessing: LSH -- Size Based Partitioning -- Two Jobs
-\end{itemize}
-\end{frame}
-
-\begin{comment}
-\begin{frame}
-\frametitle{Evaluations}
-\textbf{Impacts:  (x axis)}
-\begin{itemize}
-\item Impact of input data size
-\item Impact of k
-\item Impact of Dimension and Dataset
-\end{itemize}
-\textbf{Measures: (y axis)}
-\begin{itemize}
-\item Execution Time
-\item Communication Overhead
-\item Recall and Precision
-\end{itemize}
-\textbf{Practical Analysis}
-\end{frame}
-\end{comment}
-
-\begin{frame}
-\frametitle{Evaluation Result --- Verify the theoretical Analysis}
-Execution Time for Geo dataset (2 dimensions): 
-
-\begin{columns}
-\begin{column}{0.45\textwidth}
- 	\begin{itemize}
-\item H-BkNNJ: Naive
-\item H-BNLJ: Block Nested Loop
-\item PGBJ: Voronoi
-\item H-zkNNJ: z-value
-\item RankReduce: LSH
-\end{itemize}
-\end{column}
-\begin{column}{0.55\textwidth}
-\includegraphics<1>[width=1.2\textwidth]{figs/time.pdf}
-\end{column}
-\end{columns} 
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Evaluation Result --- Surprise}
-Execution Time for Image dataset (128 dimensions):
-\begin{columns}
-\begin{column}{0.45\textwidth}
- 	\begin{itemize}
-\item H-BkNNJ: Naive
-\item H-BNLJ: Block Nested Loop
-\item PGBJ: Voronoi
-\item H-zkNNJ: z-value
-\item RankReduce: LSH
-\end{itemize}
-\end{column}
-\begin{column}{0.55\textwidth}
-	\includegraphics<1>[width=1.2\textwidth]{figs/time_surf.pdf}
-\end{column}
-\end{columns} 
-\end{frame}
 
 \begin{frame}
 \frametitle{Outline}
@@ -689,13 +779,11 @@ Execution Time for Image dataset (128 dimensions):
 \frametitle{Conclusion}
 \begin{itemize}
 
-\item Parallel Workflow for kNN Join
+\item A detail survey for parallel kNN join on MapReduce
 
 \item Continuous kNN Join for Data Streams
 
-\item Theoretical Analysis
-
-\item Experimental Analysis for 5 Methods
+\item Theoretical and Experimental Analysis
 
 \end{itemize}
 

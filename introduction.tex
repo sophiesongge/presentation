@@ -20,14 +20,14 @@
 
 \item Youtube: 800 million visitors / month
 
-\item Twitter: Doubling its size every year
+%\item Twitter: Doubling its size every year
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Issues}
 \begin{itemize}
-\item The most significant issue comes from the size of Big Data.
+\item The size of Data.
 
 \item The flip side of size is speed.
 
@@ -43,6 +43,7 @@
 \begin{itemize}
 \item[-] Persistent \textbf{Static} Relations: \textbf{Batch-oriented} data processing
 
+
 \item[-] Transient \textbf{Dynamic} Data Streams: Real-time \textbf{stream} processing
 \end{itemize}
 
@@ -57,8 +58,21 @@
 
 \begin{frame}
 \frametitle{Objective: parallel and continuous processing for Join operation}
-\textbf{Join: } a popular and often used operation in the big data area.
+\textbf{Join: } 
+\begin{itemize}
+\item Find the common elements of several data sets under a specified condition.
 
+\item Popular and often used operation in the big data area.
+\end{itemize}
+\vspace{-0.2in}
+    \begin{center}
+    	\includegraphics<1>[width=0.5\textwidth]{figs/join.png}
+    \end{center}
+
+\end{frame}
+
+\begin{frame}
+\textbf{Type: }
 \begin{itemize}
 \item Data Driven Join : kNN (Data Parallelism)
 \item Query Driven Join : Semantic Join on RDF data (Task Parallelism)
