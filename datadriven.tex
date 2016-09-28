@@ -434,6 +434,7 @@ For each city in $R$, find the nearest city in $S$. (1-NN)
 
 \begin{frame}
 \frametitle{Sub-Optimal Load Balance}
+Partition one, deduce the other:
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \textbf{(1) Partition R into equal-sized}
@@ -495,18 +496,18 @@ $p$~$\ll \left|S\right|$ $\Rightarrow$ $\left| R_i \right|$ = $\left| R_j \right
 
 \begin{frame}
 \frametitle{Accuracy}
-Accuracy: the number of correct results we get in the end.
+Accuracy: Number of correct results obtained
 \begin{itemize}
 \item \textbf{Z-Value}
 \begin{itemize}
 \item Depends on k
 \item Shift of data --- move data in the direction of a random vector
-\item Increase the number of shifts of data will decrease the error rate
+\item Increase number of shifts of data to decrease error rate
 \end{itemize}
 \item \textbf{LSH}
 \begin{itemize}
 \item Depends on parameter tuning
-\item Increase the number of hash functions will decrease the error rate
+\item Increase the number of hash functions to decrease error rate
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -516,11 +517,11 @@ Accuracy: the number of correct results we get in the end.
 \frametitle{Complexity}
 
 \begin{itemize}
-\item \textbf{The number of MapReduce jobs: } starting a job requires some initial steps.
+\item \textbf{Number of MapReduce jobs: } starting a job requires some initial steps.
 
-\item \textbf{The number of Map tasks and Reduce tasks used to calculate $k$NN$\left(R_i \ltimes S\right)$: } the larger this number is, the more information is exchanged through the network.
+\item \textbf{Number of Map tasks and Reduce tasks used to calculate $k$NN$\left(R_i \ltimes S\right)$: } the larger this number, the more network communication
 
-\item \textbf{The number of final candidates for each object $r_i$: }  Finding the top k results is very time consuming. 
+\item \textbf{Number of final candidates for each object $r_i$: }  Finding the top k results is very time consuming. 
 \end{itemize}
 \end{frame}
 
@@ -530,7 +531,7 @@ Accuracy: the number of correct results we get in the end.
 \textbf{Cluster Setting}
 \vspace{-0.1in}
 \begin{itemize}
-\item The experiments were run on two clusters of Grid'5000 with Hadoop 1.3 (3 replications, 1 slot per node)
+\item Two clusters of Grid'5000 with Hadoop 1.3 (3 replications, 1 slot per node)
 
 \end{itemize}
 \textbf{Datasets}
@@ -604,7 +605,9 @@ Execution Time for Image dataset (128 dimensions):
 \begin{itemize}
 \item Clear and detailed view of the current algorithms for processing kNN on MapReduce
 
-\item A fine grained analysis both theoretical and experimental for each algorithm to obtain the best performance.
+\item Fine grained analysis both theoretical and experimental for each algorithm to obtain the best performance.
+
+\item Match algorithm with typical use case
 \end{itemize}
 \textbf{Limitation of the existing algorithms}
 \begin{itemize}
